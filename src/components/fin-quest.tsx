@@ -146,8 +146,7 @@ export function FinQuest() {
       const { data } = currentStep;
       const values = data.map(d => d.value);
       const min = Math.min(...values);
-      const max = Math.max(...values);
-      setSliderValue((min + max) / 2);
+      setSliderValue(min);
     }
   }, [currentStepIndex, currentStep]);
 
@@ -172,6 +171,12 @@ export function FinQuest() {
     setIsAnswered(false);
     setSelectedOption(null);
     setSubmittedAnswer(null);
+    if (currentStep.type === 'interactive_balance') {
+        const { data } = currentStep;
+        const values = data.map(d => d.value);
+        const min = Math.min(...values);
+        setSliderValue(min);
+    }
   }
   
   const handleAllocateBudget = (bucket: keyof typeof sandboxState) => {
@@ -281,7 +286,6 @@ export function FinQuest() {
           const values = data.map(d => d.value);
           const min = Math.min(...values);
           const max = Math.max(...values);
-          const domain = [min - (min * 0.25), max + (max * 0.25)];
 
           const chartData = data.map(item => ({
               ...item,
@@ -316,7 +320,12 @@ export function FinQuest() {
                           </BarChart>
                       </ResponsiveContainer>
                   </div>
-                   <div className="relative w-full max-w-sm">
+                   <div className="relative w-full max-w-sm mt-8">
+                       <div className="flex justify-center mb-4">
+                          <div className="p-2 bg-card rounded-full shadow-md border">
+                            <Scale className="h-6 w-6 text-foreground"/>
+                          </div>
+                       </div>
                       <Slider
                           value={[sliderValue]}
                           onValueChange={(value) => setSliderValue(value[0])}
@@ -326,11 +335,8 @@ export function FinQuest() {
                           disabled={isAnswered}
                           className="w-full"
                       />
-                       <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 p-2 bg-card rounded-full shadow-md">
-                          <Scale className="h-6 w-6 text-foreground"/>
-                       </div>
                    </div>
-                   <p className="mt-12 font-bold text-lg">{formatCurrency(sliderValue)}</p>
+                   <p className="mt-4 font-bold text-lg">{formatCurrency(sliderValue)}</p>
 
                    {!isAnswered && (
                        <Button onClick={handleSubmitInteractive} className="mt-4">Check Answer</Button>
@@ -456,3 +462,5 @@ export function FinQuest() {
     </Card>
   );
 }
+
+    
