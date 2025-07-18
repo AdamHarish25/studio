@@ -89,7 +89,7 @@ const moduleData = {
                 { name: 'Wants', value: 3000000 },
                 { name: 'Needs', value: 5000000 },
             ],
-            correctAnswer: 4000000,
+            correctAnswer: 4250000,
             explanation: "The balance point isn't just the middle of the number line; it's the weighted average! With Needs (5M) having more weight than Wants (3M), the balance point is pulled closer to Needs. A budget is about balancing priorities, not just splitting things equally."
         },
         {
