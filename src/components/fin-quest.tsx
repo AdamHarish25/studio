@@ -6,8 +6,11 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home } from 'lucide-react';
+import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList, ReferenceLine } from 'recharts';
+
 
 // --- Type Definitions ---
 type Option = {
@@ -19,6 +22,7 @@ type Option = {
 type BaseStep = {
   title: string;
   text: string;
+  explanation?: string;
 };
 
 type IntroStep = BaseStep & {
@@ -37,11 +41,18 @@ type QuestionStep = BaseStep & {
   options: Option[];
 };
 
+type InteractiveBalanceStep = BaseStep & {
+    type: 'interactive_balance';
+    data: { name: string; value: number }[];
+    correctAnswer: number;
+};
+
+
 type FinalStep = BaseStep & {
   type: 'final';
 };
 
-type Step = IntroStep | SandboxStep | QuestionStep | FinalStep;
+type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | InteractiveBalanceStep;
 
 // --- Module Data ---
 const moduleData = {
@@ -71,14 +82,15 @@ const moduleData = {
             ]
         },
         {
-            type: 'question' as 'question',
-            title: 'The 50/30/20 Rule',
-            text: 'A popular budgeting method is the 50/30/20 rule. Based on this, what category should get the largest portion (50%) of your income?',
-            options: [
-                { text: 'Wants (hobbies, dining out, gadgets)', isCorrect: false, feedback: 'This is the 30% category. Overspending on wants is a common trap!' },
-                { text: 'Savings & Investments', isCorrect: false, feedback: 'This is the 20% category. It\'s crucial for your future, but must you cover your essential living costs first.' },
-                { text: 'Needs (rent, groceries, utilities)', isCorrect: true, feedback: 'Exactly! 50% should be allocated to essential living expenses. Covering your needs is the foundation of a stable budget.' }
-            ]
+            type: 'interactive_balance' as 'interactive_balance',
+            title: 'Find the Balance: The 50/30/20 Rule',
+            text: 'The 50/30/20 rule suggests 50% of income for Needs and 30% for Wants. If your take-home pay is Rp 10,000,000, your Needs are Rp 5,000,000 and Wants are Rp 3,000,000. Where should the "balance point" for these two be?',
+            data: [
+                { name: 'Wants', value: 3000000 },
+                { name: 'Needs', value: 5000000 },
+            ],
+            correctAnswer: 4000000,
+            explanation: "The balance point isn't just the middle of the number line; it's the weighted average! With Needs (5M) having more weight than Wants (3M), the balance point is pulled closer to Needs. A budget is about balancing priorities, not just splitting things equally."
         },
         {
             type: 'final' as 'final',
@@ -103,6 +115,9 @@ export function FinQuest() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [sliderValue, setSliderValue] = useState(0);
+  const [submittedAnswer, setSubmittedAnswer] = useState<number | null>(null);
+
   const [sandboxState, setSandboxState] = useState({
     remaining: 0,
     needs: 0,
@@ -117,6 +132,7 @@ export function FinQuest() {
   useEffect(() => {
     setIsAnswered(false);
     setSelectedOption(null);
+    setSubmittedAnswer(null);
 
     if (currentStep.type === 'interactive_sandbox') {
       setSandboxState({
@@ -125,6 +141,13 @@ export function FinQuest() {
         wants: 0,
         savings: 0,
       });
+    }
+    if (currentStep.type === 'interactive_balance') {
+      const { data } = currentStep;
+      const values = data.map(d => d.value);
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      setSliderValue((min + max) / 2);
     }
   }, [currentStepIndex, currentStep]);
 
@@ -148,6 +171,7 @@ export function FinQuest() {
   const handleTryAgain = () => {
     setIsAnswered(false);
     setSelectedOption(null);
+    setSubmittedAnswer(null);
   }
   
   const handleAllocateBudget = (bucket: keyof typeof sandboxState) => {
@@ -160,14 +184,23 @@ export function FinQuest() {
     }));
   };
 
+  const handleSubmitInteractive = () => {
+      if (isAnswered) return;
+      setIsAnswered(true);
+      setSubmittedAnswer(sliderValue);
+  };
+
+  const isCorrectInteractive = currentStep.type === 'interactive_balance' && submittedAnswer !== null && submittedAnswer === currentStep.correctAnswer;
+
   const showContinueButton = useMemo(() => {
     if (currentStep.type === 'lesson_intro') return true;
     if (currentStep.type === 'interactive_sandbox') return sandboxState.remaining === 0;
     if (currentStep.type === 'question') return isAnswered && selectedOption?.isCorrect;
+    if (currentStep.type === 'interactive_balance') return isAnswered && isCorrectInteractive;
     return false;
-  }, [currentStep.type, isAnswered, selectedOption, sandboxState.remaining]);
+  }, [currentStep.type, isAnswered, selectedOption, sandboxState.remaining, isCorrectInteractive]);
 
-  const showTryAgainButton = currentStep.type === 'question' && isAnswered && !selectedOption?.isCorrect;
+  const showTryAgainButton = (currentStep.type === 'question' && isAnswered && !selectedOption?.isCorrect) || (currentStep.type === 'interactive_balance' && isAnswered && !isCorrectInteractive);
 
   const getOptionButtonClass = (option: Option) => {
     if (!isAnswered) {
@@ -187,7 +220,7 @@ export function FinQuest() {
         return (
             <div className="flex flex-col items-center text-center">
                 <Image
-                    data-ai-hint="man laptop piggybank"
+                    data-ai-hint="financial planning budget"
                     id="lesson-illustration"
                     src={currentStep.illustration_url}
                     alt="Budgeting illustration"
@@ -242,6 +275,66 @@ export function FinQuest() {
             </div>
           </div>
         );
+      
+      case 'interactive_balance': {
+          const { data, correctAnswer } = currentStep;
+          const values = data.map(d => d.value);
+          const min = Math.min(...values);
+          const max = Math.max(...values);
+          const domain = [min - (min * 0.25), max + (max * 0.25)];
+
+          const chartData = data.map(item => ({
+              ...item,
+              label: `${item.name}\n(${formatCurrency(item.value)})`
+          }));
+
+          return (
+              <div className="flex flex-col items-center text-center w-full">
+                  <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{currentStep.title}</h2>
+                  <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
+                  
+                  <div className="w-full h-48 mb-4">
+                      <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }} barCategoryGap="20%">
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                              <XAxis dataKey="label" tickLine={false} axisLine={false} interval={0} />
+                              <YAxis hide={true} domain={[0, max * 1.2]}/>
+                              <Tooltip content={<></>} />
+                              <Bar dataKey="value" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} barSize={40}>
+                                  <LabelList dataKey="value" position="top" formatter={(value: number) => formatCurrency(value)} />
+                              </Bar>
+                              {isAnswered && (
+                                <ReferenceLine 
+                                  x={isCorrectInteractive ? undefined : chartData.find(d => d.value === submittedAnswer)?.label}
+                                  stroke={isCorrectInteractive ? "hsl(var(--primary))" : "hsl(var(--destructive))"} 
+                                  strokeWidth={2}
+                                />
+                              )}
+                          </BarChart>
+                      </ResponsiveContainer>
+                  </div>
+                   <div className="relative w-full max-w-sm">
+                      <Slider
+                          value={[sliderValue]}
+                          onValueChange={(value) => setSliderValue(value[0])}
+                          min={min}
+                          max={max}
+                          step={(max - min) / 100}
+                          disabled={isAnswered}
+                          className="w-full"
+                      />
+                       <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 p-2 bg-card rounded-full shadow-md">
+                          <Scale className="h-6 w-6 text-foreground"/>
+                       </div>
+                   </div>
+                   <p className="mt-12 font-bold text-lg">{formatCurrency(sliderValue)}</p>
+
+                   {!isAnswered && (
+                       <Button onClick={handleSubmitInteractive} className="mt-4">Check Answer</Button>
+                   )}
+              </div>
+          );
+      }
         
       case 'question':
         return (
@@ -276,6 +369,40 @@ export function FinQuest() {
     }
   };
 
+  const renderFeedback = () => {
+    if (!isAnswered) return null;
+
+    let isCorrect = false;
+    let feedbackText = '';
+
+    if (currentStep.type === 'question' && selectedOption) {
+        isCorrect = selectedOption.isCorrect;
+        feedbackText = selectedOption.feedback;
+    } else if (currentStep.type === 'interactive_balance') {
+        isCorrect = isCorrectInteractive;
+        feedbackText = isCorrect ? "That's right! You've found the perfect balance." : currentStep.explanation || "Not quite. Let's see the explanation.";
+    } else {
+        return null;
+    }
+
+    return (
+        <div className={cn(
+            "w-full max-w-md p-4 mt-4 rounded-2xl flex items-start space-x-4 animate-in fade-in duration-500",
+            isCorrect ? 'bg-accent' : 'bg-destructive/20'
+        )}>
+            {isCorrect ?
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" /> :
+                <XCircle className="h-6 w-6 text-destructive flex-shrink-0 mt-1" />
+            }
+            <p className={cn(
+                "font-bold text-left",
+                isCorrect ? 'text-accent-foreground' : 'text-destructive'
+            )}>{feedbackText}</p>
+        </div>
+    );
+};
+
+
   return (
     <Card className="w-full max-w-3xl shadow-soft font-body">
       <CardHeader>
@@ -289,21 +416,7 @@ export function FinQuest() {
         <div className="w-full flex-grow flex flex-col items-center justify-center">
             {renderContent()}
 
-            {isAnswered && selectedOption && currentStep.type === 'question' && (
-              <div className={cn(
-                "w-full max-w-md p-4 mt-4 rounded-2xl flex items-start space-x-4 animate-in fade-in duration-500",
-                selectedOption.isCorrect ? 'bg-accent' : 'bg-destructive/20'
-              )}>
-                {selectedOption.isCorrect ? 
-                  <CheckCircle className="h-6 w-6 text-primary flex-shrink-0 mt-1" /> : 
-                  <XCircle className="h-6 w-6 text-destructive flex-shrink-0 mt-1" />
-                }
-                <p className={cn(
-                  "font-bold text-left",
-                  selectedOption.isCorrect ? 'text-accent-foreground' : 'text-destructive'
-                )}>{selectedOption.feedback}</p>
-              </div>
-            )}
+            {isAnswered && renderFeedback()}
         </div>
 
         <div className="mt-8 pt-4">
