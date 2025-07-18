@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -84,7 +85,14 @@ export function FinQuest() {
     setSelectedOption(null);
   }
 
+  const handleTryAgain = () => {
+    setIsAnswered(false);
+    setSelectedOption(null);
+  }
+
   const showContinueButton = (currentStep.type === 'intro') || (isAnswered && selectedOption?.isCorrect);
+  const showTryAgainButton = isAnswered && !selectedOption?.isCorrect;
+
 
   const getOptionButtonClass = (option: Option) => {
     if (!isAnswered) {
@@ -152,6 +160,16 @@ export function FinQuest() {
               className="font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform bg-primary hover:bg-accent-hover"
             >
               Continue
+            </Button>
+          )}
+          {showTryAgainButton && (
+            <Button 
+              onClick={handleTryAgain} 
+              size="lg"
+              variant="outline"
+              className="font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform hover:bg-accent-hover"
+            >
+              Try Again
             </Button>
           )}
            {currentStep.type === 'final' && (
