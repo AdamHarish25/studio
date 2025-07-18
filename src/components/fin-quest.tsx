@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale } from 'lucide-react';
+import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale, Lightbulb } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList, ReferenceLine } from 'recharts';
 
 
@@ -36,6 +36,15 @@ type SandboxStep = BaseStep & {
   increment: number;
 };
 
+type AllocationFeedbackStep = BaseStep & {
+    type: 'allocation_feedback';
+    recommendedAllocation: {
+        needs: number;
+        wants: number;
+        savings: number;
+    };
+};
+
 type QuestionStep = BaseStep & {
   type: 'question';
   options: Option[];
@@ -52,7 +61,7 @@ type FinalStep = BaseStep & {
   type: 'final';
 };
 
-type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | InteractiveBalanceStep;
+type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | InteractiveBalanceStep | AllocationFeedbackStep;
 
 // --- Module Data ---
 const moduleData = {
@@ -62,7 +71,7 @@ const moduleData = {
             type: 'lesson_intro' as 'lesson_intro',
             title: 'Budgeting Basics',
             text: "Your first salary is exciting! Let's learn how a simple budget can help you control your money and reach your goals.",
-            illustration_url: 'https://i.imgur.com/8dbP4S2.png'
+            illustration_url: '/visualHead.jpeg'
         },
         {
             type: 'interactive_sandbox' as 'interactive_sandbox',
@@ -70,6 +79,16 @@ const moduleData = {
             text: 'You have Rp 5,000,000. Click on the buckets below to allocate your money in chunks of Rp 500,000 and see how it splits.',
             totalBudget: 5000000,
             increment: 500000
+        },
+        {
+            type: 'allocation_feedback' as 'allocation_feedback',
+            title: 'Your Budget Review',
+            text: "Let's see how your allocation stacks up against a common guideline: 50% for Needs, 20% for Wants, and 30% for Savings. This isn't a strict rule, but a great starting point!",
+            recommendedAllocation: {
+                needs: 50,
+                wants: 20,
+                savings: 30,
+            }
         },
         {
             type: 'question' as 'question',
@@ -134,6 +153,8 @@ export function FinQuest() {
     setSelectedOption(null);
     setSubmittedAnswer(null);
 
+    const sandboxStep = moduleData.steps.find(step => step.type === 'interactive_sandbox');
+
     if (currentStep.type === 'interactive_sandbox') {
       setSandboxState({
         remaining: currentStep.totalBudget,
@@ -141,8 +162,9 @@ export function FinQuest() {
         wants: 0,
         savings: 0,
       });
-    }
-    if (currentStep.type === 'interactive_balance') {
+    } else if (currentStep.type === 'allocation_feedback' && sandboxStep?.type === 'interactive_sandbox') {
+        // Persist sandbox state for the feedback screen
+    } else if (currentStep.type === 'interactive_balance') {
       const { data } = currentStep;
       const values = data.map(d => d.value);
       const min = Math.min(...values);
@@ -179,13 +201,14 @@ export function FinQuest() {
     }
   }
   
-  const handleAllocateBudget = (bucket: keyof typeof sandboxState) => {
-    if (currentStep.type !== 'interactive_sandbox' || sandboxState.remaining === 0) return;
+  const handleAllocateBudget = (bucket: keyof Omit<typeof sandboxState, 'remaining'>) => {
+    const sandboxStep = moduleData.steps.find(s => s.type === 'interactive_sandbox') as SandboxStep | undefined;
+    if (!sandboxStep || sandboxState.remaining === 0) return;
     
     setSandboxState(prev => ({
       ...prev,
-      remaining: prev.remaining - currentStep.increment,
-      [bucket]: prev[bucket] + currentStep.increment,
+      remaining: prev.remaining - sandboxStep.increment,
+      [bucket]: prev[bucket] + sandboxStep.increment,
     }));
   };
 
@@ -200,6 +223,7 @@ export function FinQuest() {
   const showContinueButton = useMemo(() => {
     if (currentStep.type === 'lesson_intro') return true;
     if (currentStep.type === 'interactive_sandbox') return sandboxState.remaining === 0;
+    if (currentStep.type === 'allocation_feedback') return true;
     if (currentStep.type === 'question') return isAnswered && selectedOption?.isCorrect;
     if (currentStep.type === 'interactive_balance') return isAnswered && isCorrectInteractive;
     return false;
@@ -239,7 +263,10 @@ export function FinQuest() {
         );
 
       case 'interactive_sandbox':
-        const totalBudget = currentStep.totalBudget;
+        const sandboxStep = moduleData.steps.find(s => s.type === 'interactive_sandbox') as SandboxStep | undefined;
+        if (!sandboxStep) return null;
+        
+        const totalBudget = sandboxStep.totalBudget;
         const buckets = [
           { id: 'needs' as const, label: 'Needs', icon: Home, color: 'text-blue-500' },
           { id: 'wants' as const, label: 'Wants', icon: ShoppingCart, color: 'text-pink-500' },
@@ -280,6 +307,62 @@ export function FinQuest() {
             </div>
           </div>
         );
+
+    case 'allocation_feedback': {
+        const sandboxStep = moduleData.steps.find(s => s.type === 'interactive_sandbox') as SandboxStep | undefined;
+        if (!sandboxStep) return null;
+        
+        const { recommendedAllocation } = currentStep;
+        const totalBudget = sandboxStep.totalBudget;
+
+        const results = [
+            {
+                category: 'Needs',
+                yourPercentage: (sandboxState.needs / totalBudget) * 100,
+                targetPercentage: recommendedAllocation.needs,
+            },
+            {
+                category: 'Wants',
+                yourPercentage: (sandboxState.wants / totalBudget) * 100,
+                targetPercentage: recommendedAllocation.wants,
+            },
+            {
+                category: 'Savings',
+                yourPercentage: (sandboxState.savings / totalBudget) * 100,
+                targetPercentage: recommendedAllocation.savings,
+            },
+        ];
+        
+        const getFeedback = (your: number, target: number) => {
+            const diff = Math.abs(your - target);
+            if (diff <= 5) return { text: "On Track", color: "text-green-600" };
+            if (your > target) return { text: "A bit high", color: "text-amber-600" };
+            return { text: "A bit low", color: "text-amber-600" };
+        };
+
+        return (
+            <div className="flex flex-col items-center text-center w-full">
+                <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{currentStep.title}</h2>
+                <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
+                <div className="w-full max-w-lg space-y-4">
+                    {results.map(result => (
+                        <Card key={result.category} className="p-4 flex items-center justify-between">
+                            <div className="text-left">
+                                <p className="font-bold text-lg text-foreground">{result.category}</p>
+                                <p className="text-sm text-muted-foreground">Target: {result.targetPercentage}%</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="font-extrabold text-xl text-primary">{result.yourPercentage.toFixed(0)}%</p>
+                                 <p className={cn("text-sm font-bold", getFeedback(result.yourPercentage, result.targetPercentage).color)}>
+                                    {getFeedback(result.yourPercentage, result.targetPercentage).text}
+                                </p>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        )
+    }
       
       case 'interactive_balance': {
           const { data, correctAnswer } = currentStep;
