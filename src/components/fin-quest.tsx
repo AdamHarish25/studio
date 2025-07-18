@@ -51,7 +51,7 @@ const moduleData = {
             type: 'lesson_intro' as 'lesson_intro',
             title: 'Budgeting Basics',
             text: "Your first salary is exciting! Let's learn how a simple budget can help you control your money and reach your goals.",
-            illustration_url: 'https://storage.googleapis.com/aai-web-samples/financial-apps/user_supplied/8d17d12a-36d7-4089-a359-86e069171b3e.png'
+            illustration_url: 'https://i.imgur.com/Q5Gqk8A.png'
         },
         {
             type: 'interactive_sandbox' as 'interactive_sandbox',
