@@ -51,7 +51,7 @@ const moduleData = {
             type: 'lesson_intro' as 'lesson_intro',
             title: 'Budgeting Basics',
             text: "Your first salary is exciting! Let's learn how a simple budget can help you control your money and reach your goals.",
-            illustration_url: 'https://placehold.co/600x400.png'
+            illustration_url: 'https://storage.googleapis.com/aai-web-samples/financial-apps/user_supplied/8d17d12a-36d7-4089-a359-86e069171b3e.png'
         },
         {
             type: 'interactive_sandbox' as 'interactive_sandbox',
@@ -187,7 +187,7 @@ export function FinQuest() {
         return (
             <div className="flex flex-col items-center text-center">
                 <Image
-                    data-ai-hint="illustration finance"
+                    data-ai-hint="man laptop piggybank"
                     id="lesson-illustration"
                     src={currentStep.illustration_url}
                     alt="Budgeting illustration"
