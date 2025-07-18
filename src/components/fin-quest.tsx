@@ -62,7 +62,7 @@ const moduleData = {
             type: 'lesson_intro' as 'lesson_intro',
             title: 'Budgeting Basics',
             text: "Your first salary is exciting! Let's learn how a simple budget can help you control your money and reach your goals.",
-            illustration_url: 'https://i.imgur.com/Q5Gqk8A.png'
+            illustration_url: 'https://i.imgur.com/8dbP4S2.png'
         },
         {
             type: 'interactive_sandbox' as 'interactive_sandbox',
@@ -287,6 +287,9 @@ export function FinQuest() {
               ...item,
               label: `${item.name}\n(${formatCurrency(item.value)})`
           }));
+          
+          const EmptyTooltip = () => null;
+
 
           return (
               <div className="flex flex-col items-center text-center w-full">
@@ -299,7 +302,7 @@ export function FinQuest() {
                               <CartesianGrid strokeDasharray="3 3" vertical={false} />
                               <XAxis dataKey="label" tickLine={false} axisLine={false} interval={0} />
                               <YAxis hide={true} domain={[0, max * 1.2]}/>
-                              <Tooltip content={<></>} />
+                              <Tooltip content={<EmptyTooltip />} />
                               <Bar dataKey="value" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} barSize={40}>
                                   <LabelList dataKey="value" position="top" formatter={(value: number) => formatCurrency(value)} />
                               </Bar>
