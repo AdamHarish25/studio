@@ -10,11 +10,12 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        body: ['"Nunito"', 'sans-serif'],
+        headline: ['"Nunito"', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
+        'accent-hover': '#6EE7B7',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -70,6 +71,9 @@ export default {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      boxShadow: {
+        soft: '0 8px 16px rgba(0,0,0,0.08)',
       },
       keyframes: {
         'accordion-down': {
