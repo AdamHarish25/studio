@@ -89,7 +89,7 @@ const moduleData = {
                 { name: 'Wants', value: 3000000 },
                 { name: 'Needs', value: 5000000 },
             ],
-            correctAnswer: 4250000,
+            correctAnswer: 4000000,
             explanation: "The balance point isn't just the middle of the number line; it's the weighted average! With Needs (5M) having more weight than Wants (3M), the balance point is pulled closer to Needs. A budget is about balancing priorities, not just splitting things equally."
         },
         {
@@ -300,6 +300,12 @@ export function FinQuest() {
                   <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{currentStep.title}</h2>
                   <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
                   
+                   <div className="flex justify-center mb-4">
+                      <div className="p-2 bg-card rounded-full shadow-md border">
+                        <Scale className="h-6 w-6 text-foreground"/>
+                      </div>
+                   </div>
+
                   <div className="w-full h-48 mb-4">
                       <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }} barCategoryGap="20%">
@@ -321,11 +327,6 @@ export function FinQuest() {
                       </ResponsiveContainer>
                   </div>
                    <div className="relative w-full max-w-sm mt-8">
-                       <div className="flex justify-center mb-4">
-                          <div className="p-2 bg-card rounded-full shadow-md border">
-                            <Scale className="h-6 w-6 text-foreground"/>
-                          </div>
-                       </div>
                       <Slider
                           value={[sliderValue]}
                           onValueChange={(value) => setSliderValue(value[0])}
@@ -462,5 +463,3 @@ export function FinQuest() {
     </Card>
   );
 }
-
-    
