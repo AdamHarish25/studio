@@ -26,7 +26,7 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
                     </Link>
                 </Button>
             </div>
-            <FinQuest lessonData={lessonData} />
+            <FinQuest lessonData={lessonData} lessonId={lessonData.id} />
        </main>
     </div>
   );

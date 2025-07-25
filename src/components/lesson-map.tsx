@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { Lesson } from '@/lib/course-data';
 import { Flame, Landmark, Scale, Milestone, LucideProps, CheckCircle } from 'lucide-react';
+import { useUserProgress } from '@/context/user-progress-context';
 
 type LessonMapProps = {
   lessons: Lesson[];
@@ -21,9 +22,25 @@ const iconMap: { [key: string]: React.FC<LucideProps> } = {
 
 
 export function LessonMap({ lessons }: LessonMapProps) {
+  const { completedLessons } = useUserProgress();
+  
+  // Find first uncompleted lesson to be the current one
+  const currentLesson = lessons.find(l => !completedLessons.includes(l.id)) || lessons[lessons.length - 1];
+  
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(
-    lessons.find(l => l.status === 'current') || lessons[0]
+    currentLesson
   );
+
+  const getStatus = (lessonId: string) => {
+    if (completedLessons.includes(lessonId)) {
+      return 'completed';
+    }
+    if (lessonId === currentLesson.id) {
+        return 'current';
+    }
+    return 'locked';
+  }
+
 
   return (
     <div className="relative">
@@ -32,9 +49,10 @@ export function LessonMap({ lessons }: LessonMapProps) {
 
       <div className="space-y-8">
         {lessons.map(lesson => {
+          const status = getStatus(lesson.id);
           const isSelected = selectedLesson?.id === lesson.id;
-          const isLocked = lesson.status === 'locked';
-          const isCompleted = lesson.status === 'completed';
+          const isLocked = status === 'locked';
+          const isCompleted = status === 'completed';
           const Icon = iconMap[lesson.icon];
 
           return (
@@ -93,9 +111,9 @@ export function LessonMap({ lessons }: LessonMapProps) {
               <h3 className="font-bold">{selectedLesson.title}</h3>
               <p className="text-sm text-muted-foreground">{selectedLesson.description}</p>
             </div>
-            <Button asChild size="lg" disabled={selectedLesson.status === 'locked'}>
+            <Button asChild size="lg" disabled={getStatus(selectedLesson.id) === 'locked'}>
               <Link href={`/lesson/${selectedLesson.slug}`}>
-                {selectedLesson.status === 'completed' ? 'Review' : 'Start'}
+                {getStatus(selectedLesson.id) === 'completed' ? 'Review' : 'Start'}
               </Link>
             </Button>
           </CardContent>

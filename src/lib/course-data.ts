@@ -70,6 +70,7 @@ export type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | Interact
 export type LessonData = {
     title: string;
     steps: Step[];
+    id: string; // Add lesson ID here
 }
 
 export type AllCourseData = {
@@ -80,6 +81,7 @@ export type AllCourseData = {
 // --- Course Data ---
 
 const budgetingBasics: LessonData = {
+    id: 'l1',
     title: "First Salary Budgeting",
     steps: [
         {
@@ -141,6 +143,7 @@ const budgetingBasics: LessonData = {
 };
 
 const understandingDebt: LessonData = {
+    id: 'l2',
     title: "Understanding Debt",
     steps: [
         {
@@ -187,8 +190,8 @@ export const allCourseData: AllCourseData = {
     'budgeting-basics': budgetingBasics,
     'understanding-debt': understandingDebt,
     // Future lessons can be added here
-    'savings-and-investments': { title: "Savings & Investments", steps: [] },
-    'final-review': { title: "Final Review", steps: [] },
+    'savings-and-investments': { title: "Savings & Investments", id: 'l3', steps: [] },
+    'final-review': { title: "Final Review", id: 'l4', steps: [] },
 }
 
 // --- LESSON MAP DATA (separate from lesson content) ---
@@ -198,7 +201,6 @@ export type Lesson = {
   title: string;
   slug: string;
   icon: string;
-  status: 'locked' | 'current' | 'completed';
   description: string;
 };
 
@@ -219,7 +221,6 @@ export const courseData: CourseData = {
       title: 'Budgeting Basics',
       slug: 'budgeting-basics',
       icon: 'Flame',
-      status: 'completed',
       description: "Learn how a simple budget can help you control your money and reach your goals."
     },
     {
@@ -228,7 +229,6 @@ export const courseData: CourseData = {
       title: 'Understanding Debt',
       slug: 'understanding-debt',
       icon: 'Scale',
-      status: 'current',
       description: "Not all debt is created equal. Learn to distinguish between good and bad debt."
     },
     {
@@ -237,7 +237,6 @@ export const courseData: CourseData = {
       title: 'Savings & Investments',
       slug: 'savings-and-investments',
       icon: 'Landmark',
-      status: 'locked',
       description: "Discover the power of compound interest and start building your nest egg."
     },
      {
@@ -246,7 +245,6 @@ export const courseData: CourseData = {
       title: 'Final Review',
       slug: 'final-review',
       icon: 'Milestone',
-      status: 'locked',
       description: "Test your knowledge and see how far you've come on your financial journey."
     },
   ],

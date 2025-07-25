@@ -32,7 +32,7 @@ const iconMap = {
 }
 
 // --- Main Component ---
-export function FinQuest({ lessonData }: { lessonData: LessonData }) {
+export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, lessonId: string }) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<any | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -42,7 +42,7 @@ export function FinQuest({ lessonData }: { lessonData: LessonData }) {
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
 
 
-  const { addExp } = useUserProgress();
+  const { addExp, completeLesson } = useUserProgress();
   const [sessionExp, setSessionExp] = useState(0);
 
   const [sandboxState, setSandboxState] = useState({
@@ -78,8 +78,10 @@ export function FinQuest({ lessonData }: { lessonData: LessonData }) {
     } else if (step.type === 'interactive_sorting') {
         // Randomize scenario on step load
         setCurrentScenarioIndex(Math.floor(Math.random() * step.scenarios.length));
+    } else if (step.type === 'final') {
+        completeLesson(lessonId);
     }
-  }, [currentStepIndex, lessonData.steps]);
+  }, [currentStepIndex, lessonData.steps, completeLesson, lessonId]);
 
 
   const handleOptionClick = (option: any) => {
