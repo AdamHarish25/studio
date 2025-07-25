@@ -1,6 +1,7 @@
 
 
 
+
 // --- Type Definitions ---
 type Option = {
   text: string;
@@ -82,6 +83,7 @@ type FinalScenarioEvent = {
             debt?: number;
             investments?: number;
         };
+        feedback: string;
     }[];
 };
 
@@ -290,16 +292,16 @@ const finalReview: LessonData = {
                     title: "Unexpected Expense",
                     text: "Your laptop broke! A new one costs Rp 7,000,000. How do you pay for it?",
                     choices: [
-                        { text: "Pay with savings.", impact: { savings: -7000000 } },
-                        { text: "Take a new high-interest loan.", impact: { debt: 7500000 } }
+                        { text: "Pay with savings.", impact: { savings: -7000000 }, feedback: "Good choice! Using your savings means you avoid taking on new, high-interest debt. It's a tough hit to your savings, but financially sound. This is what an emergency fund is for!" },
+                        { text: "Take a new high-interest loan.", impact: { debt: 7500000 }, feedback: "This is a quick fix, but it's costly. The high interest means you'll pay back much more than the laptop is worth. This is 'bad debt' that can trap you in a cycle of payments." }
                     ]
                 },
                 {
                     title: "Investment Opportunity",
                     text: "A friend offers you a chance to invest in their startup. It requires Rp 5,000,000.",
                     choices: [
-                        { text: "Invest from savings.", impact: { savings: -5000000, investments: 5000000 } },
-                        { text: "Decline the opportunity.", impact: {} }
+                        { text: "Invest from savings.", impact: { savings: -5000000, investments: 5000000 }, feedback: "This is a classic risk-vs-reward scenario. Investing in a startup is risky, but the potential for a high return is there. Using savings shows you're willing to take a calculated risk for future growth." },
+                        { text: "Decline the opportunity.", impact: {}, feedback: "This is the safer option. You protect your savings and avoid a risky venture. While you miss out on potential gains, you also avoid potential losses. There's nothing wrong with being cautious!" }
                     ]
                 }
             ]

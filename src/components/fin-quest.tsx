@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale, Award, ThumbsUp, ThumbsDown, GraduationCap, Briefcase, Handshake, ToyBrick, Landmark, TrendingUp, Wallet, Banknote, Shield } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, ReferenceLine } from 'recharts';
@@ -45,6 +46,9 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
   const { addExp, completeLesson } = useUserProgress();
   const [sessionExp, setSessionExp] = useState(0);
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [feedbackContent, setFeedbackContent] = useState<{ title: string; description: string; action: () => void } | null>(null);
+
 
   const [sandboxState, setSandboxState] = useState({
     remaining: 0,
@@ -194,16 +198,26 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
   const handleScenarioChoice = (choice: any) => {
     if (currentStep.type !== 'interactive_scenario') return;
-
-    // Apply impact
-    setScenarioState(prev => ({
-      ...prev,
-      savings: prev.savings + (choice.impact.savings || 0),
-      debt: prev.debt + (choice.impact.debt || 0),
-      investments: prev.investments + (choice.impact.investments || 0),
-      currentEventIndex: prev.currentEventIndex + 1,
-    }));
-  }
+  
+    const applyChanges = () => {
+      // Apply impact
+      setScenarioState(prev => ({
+        ...prev,
+        savings: prev.savings + (choice.impact.savings || 0),
+        debt: prev.debt + (choice.impact.debt || 0),
+        investments: prev.investments + (choice.impact.investments || 0),
+        currentEventIndex: prev.currentEventIndex + 1,
+      }));
+    };
+  
+    // Show feedback dialog
+    setFeedbackContent({
+      title: "Decision Breakdown",
+      description: choice.feedback,
+      action: applyChanges
+    });
+    setFeedbackDialogOpen(true);
+  };
 
 
   const isCorrectInteractive = useMemo(() => {
@@ -689,6 +703,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
 
   return (
+    <>
     <Card className="w-full max-w-3xl shadow-soft font-body">
       <CardHeader>
         <div className="flex justify-between items-center mb-4">
@@ -736,5 +751,26 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
         </div>
       </CardContent>
     </Card>
+    {feedbackContent && (
+        <AlertDialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{feedbackContent.title}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {feedbackContent.description}
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogAction onClick={() => {
+                        feedbackContent.action();
+                        setFeedbackDialogOpen(false);
+                    }}>
+                        Understood
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    )}
+    </>
   );
 }
