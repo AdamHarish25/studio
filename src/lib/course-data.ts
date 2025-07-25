@@ -1,3 +1,197 @@
+
+// --- Type Definitions ---
+type Option = {
+  text: string;
+  isCorrect: boolean;
+  feedback: string;
+};
+
+type Scenario = {
+  name: string;
+  icon: string;
+  wiseChoice: 'Good Debt' | 'Bad Debt';
+  feedback: {
+    correct: string;
+    incorrect: string;
+  }
+};
+
+type BaseStep = {
+  title: string;
+  text: string;
+  exp: number;
+};
+
+type IntroStep = BaseStep & {
+  type: 'lesson_intro';
+  illustration_url: string;
+};
+
+type SandboxStep = BaseStep & {
+  type: 'interactive_sandbox';
+  totalBudget: number;
+  increment: number;
+};
+
+type AllocationFeedbackStep = BaseStep & {
+    type: 'allocation_feedback';
+    recommendedAllocation: {
+        needs: number;
+        wants: number;
+        savings: number;
+    };
+};
+
+type InteractiveSortingStep = BaseStep & {
+    type: 'interactive_sorting';
+    scenarios: Scenario[];
+}
+
+type QuestionStep = BaseStep & {
+  type: 'question';
+  options: Option[];
+  explanation?: string;
+};
+
+type InteractiveBalanceStep = BaseStep & {
+    type: 'interactive_balance';
+    data: { name: string; value: number }[];
+    correctAnswer: number;
+    explanation?: string;
+};
+
+
+type FinalStep = BaseStep & {
+  type: 'final';
+};
+
+export type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | InteractiveBalanceStep | AllocationFeedbackStep | InteractiveSortingStep;
+
+export type LessonData = {
+    title: string;
+    steps: Step[];
+}
+
+export type AllCourseData = {
+    [key: string]: LessonData;
+}
+
+
+// --- Course Data ---
+
+const budgetingBasics: LessonData = {
+    title: "First Salary Budgeting",
+    steps: [
+        {
+            type: 'lesson_intro',
+            title: 'Budgeting Basics',
+            text: "Your first salary is exciting! Let's learn how a simple budget can help you control your money and reach your goals.",
+            illustration_url: 'https://i.imgur.com/3nL3gd7.png',
+            exp: 10,
+        },
+        {
+            type: 'interactive_sandbox',
+            title: 'Allocate Your Budget',
+            text: 'You have Rp 5,000,000. Click on the buckets below to allocate your money in chunks of Rp 500,000 and see how it splits.',
+            totalBudget: 5000000,
+            increment: 500000,
+            exp: 50,
+        },
+        {
+            type: 'allocation_feedback',
+            title: 'Your Budget Review',
+            text: "Let's see how your allocation stacks up against a common guideline: 50% for Needs, 30% for Savings, and 20% for Wants. This isn't a strict rule, but a great starting point!",
+            recommendedAllocation: {
+                needs: 50,
+                wants: 20,
+                savings: 30,
+            },
+            exp: 10,
+        },
+        {
+            type: 'question',
+            title: 'Prioritize First',
+            text: 'After planning, what is the wisest first allocation?',
+            options: [
+                { text: 'Plan a vacation with friends.', isCorrect: false, feedback: "While fun, this is a 'want', not a 'need'. A solid financial base comes first!" },
+                { text: 'Create a budget plan.', isCorrect: true, feedback: 'Excellent! A budget is a map for your money. It tells your money where to go instead of wondering where it went.' },
+                { text: 'Buy the latest smartphone.', isCorrect: false, feedback: "Tempting! But impulsive big purchases can derail your financial goals before you even start." }
+            ],
+            exp: 25,
+        },
+        {
+            type: 'interactive_balance',
+            title: 'Find the Balance: The 50/30/20 Rule',
+            text: 'The 50/30/20 rule suggests 50% of income for Needs and 30% for Wants. If your take-home pay is Rp 10,000,000, your Needs are Rp 5,000,000 and Wants are Rp 3,000,000. Where should the "balance point" for these two be?',
+            data: [
+                { name: 'Wants', value: 3000000 },
+                { name: 'Needs', value: 5000000 },
+            ],
+            correctAnswer: 4000000,
+            explanation: "The balance point isn't just the middle of the number line; it's the weighted average! With Needs (5M) having more weight than Wants (3M), the balance point is pulled closer to Needs. A budget is about balancing priorities, not just splitting things equally.",
+            exp: 50,
+        },
+        {
+            type: 'final',
+            title: 'Well Done!',
+            text: 'You\'ve learned the basics of prioritizing and budgeting. You are now ready to make smarter financial decisions from day one. Keep this momentum going!',
+            exp: 0,
+        }
+    ]
+};
+
+const understandingDebt: LessonData = {
+    title: "Understanding Debt",
+    steps: [
+        {
+            type: 'lesson_intro',
+            title: 'What is Debt?',
+            text: "Debt is when you borrow money that you have to pay back, usually with an extra charge called 'interest'. Let's learn how to make debt work for you, not against you.",
+            illustration_url: 'https://i.imgur.com/2U5VqX6.png',
+            exp: 10
+        },
+        {
+            type: 'interactive_sorting',
+            title: 'Good Debt vs. Bad Debt',
+            text: "A loan is presented to you. Based on its purpose, decide if it's generally considered 'Good Debt' (helps increase your net worth or future income) or 'Bad Debt' (finances things that lose value or are consumed).",
+            scenarios: [
+                { name: "A student loan for a university degree.", icon: 'GraduationCap', wiseChoice: 'Good Debt', feedback: { correct: "Great choice! Education is an investment in yourself that can increase your future earnings.", incorrect: "Actually, this is usually good debt because it can help you earn more money in the future." } },
+                { name: "A loan to start a small online business.", icon: 'Briefcase', wiseChoice: 'Good Debt', feedback: { correct: "Correct! This loan could help you build a profitable business and increase your net worth.", incorrect: "This is typically considered good debt, as it's an investment with the potential for growth." } },
+                { name: "A loan to buy the newest, most expensive smartphone.", icon: 'ShoppingCart', wiseChoice: 'Bad Debt', feedback: { correct: "Exactly! The phone's value drops quickly, making this a classic example of bad debt.", incorrect: "Think again. This is usually bad debt because the phone loses value the moment you buy it." } },
+                { name: "A big loan for a wedding party.", icon: 'Handshake', wiseChoice: 'Bad Debt', feedback: { correct: "You got it. While a wedding is a happy event, a large loan for it is consumption, not an investment.", incorrect: "This is generally considered bad debt because it's for a one-time event and doesn't generate income." } },
+                { name: "A loan for buying the latest toys.", icon: 'ToyBrick', wiseChoice: 'Bad Debt', feedback: { correct: "That's right! Toys are 'wants' that don't increase in value, so borrowing for them is bad debt.", incorrect: "This is a form of bad debt. It's better to save up for toys instead of borrowing." } },
+            ],
+            exp: 50
+        },
+        {
+            type: 'question',
+            title: 'The Cost of Debt',
+            text: 'You take a loan of Rp 1,000,000 with a 10% simple annual interest rate. If you pay it back after one year, how much will you pay in total?',
+            options: [
+                { text: 'Rp 1,000,000', isCorrect: false, feedback: "Not quite. You must also pay the interest, which is the cost of borrowing the money." },
+                { text: 'Rp 1,010,000', isCorrect: false, feedback: "Check your calculation. 10% of 1,000,000 is more than 10,000." },
+                { text: 'Rp 1,100,000', isCorrect: true, feedback: 'Exactly! The total payment is the original loan (Rp 1,000,000) plus the interest (Rp 100,000).' }
+            ],
+            exp: 25,
+        },
+        {
+            type: 'final',
+            title: 'Debt Mastered!',
+            text: 'Great job! You now understand the critical difference between using debt as a tool for growth and letting it become a burden.',
+            exp: 0
+        }
+    ]
+};
+
+export const allCourseData: AllCourseData = {
+    'budgeting-basics': budgetingBasics,
+    'understanding-debt': understandingDebt,
+    // Future lessons can be added here
+    'savings-and-investments': { title: "Savings & Investments", steps: [] },
+    'final-review': { title: "Final Review", steps: [] },
+}
+
+// --- LESSON MAP DATA (separate from lesson content) ---
 export type Lesson = {
   id: string;
   level: number;

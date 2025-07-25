@@ -1,16 +1,16 @@
 import { FinQuest } from '@/components/fin-quest';
-import { courseData } from '@/lib/course-data';
+import { allCourseData } from '@/lib/course-data';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Home } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Header } from '@/components/layout/header';
 
 
 export default function LessonPage({ params }: { params: { slug: string } }) {
-  const lesson = courseData.lessons.find(l => l.slug === params.slug);
+  const lessonData = allCourseData[params.slug];
 
-  if (!lesson) {
+  if (!lessonData) {
     notFound();
   }
 
@@ -26,7 +26,7 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
                     </Link>
                 </Button>
             </div>
-            <FinQuest />
+            <FinQuest lessonData={lessonData} />
        </main>
     </div>
   );
