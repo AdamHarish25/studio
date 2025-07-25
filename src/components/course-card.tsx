@@ -1,6 +1,9 @@
+"use client";
+
 import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { BookOpen, BarChart2 } from 'lucide-react';
+import { useUserProgress } from '@/context/user-progress-context';
 
 type CourseCardProps = {
   title: string;
@@ -10,6 +13,7 @@ type CourseCardProps = {
 };
 
 export function CourseCard({ title, description, lessons, exercises }: CourseCardProps) {
+  const { totalExp } = useUserProgress();
   return (
     <Card className="sticky top-24">
       <CardHeader className="p-4">
