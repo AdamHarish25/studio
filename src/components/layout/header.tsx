@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Home, BookOpen, Menu, Zap, Gem } from 'lucide-react';
 import { useUserProgress } from '@/context/user-progress-context';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 export function Header() {
   const { totalExp } = useUserProgress();
@@ -51,6 +51,12 @@ export function Header() {
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="right">
+                    <SheetHeader>
+                        <SheetTitle className="sr-only">Menu</SheetTitle>
+                        <SheetDescription className="sr-only">
+                            Navigate the application, view your experience points, or go premium.
+                        </SheetDescription>
+                    </SheetHeader>
                      <nav className="grid gap-4 text-lg font-medium mt-8">
                         <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground">
                            <Home className="h-5 w-5" />
