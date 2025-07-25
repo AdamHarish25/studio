@@ -13,8 +13,8 @@ export function Header() {
   const { totalExp } = useUserProgress();
   const pathname = usePathname();
 
-  const isCoursesPage = pathname === '/' || pathname.startsWith('/lesson');
-  const isHomePage = pathname === '/'; // Example if you had a separate home page, for now '/' is courses
+  const isHomePage = pathname === '/';
+  const isCoursesPage = pathname.startsWith('/lesson');
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -27,7 +27,7 @@ export function Header() {
             </span>
           </Link>
           <nav className="flex items-center gap-4 text-sm">
-             <Button variant="ghost" asChild className={cn("text-muted-foreground transition-colors hover:text-foreground", isHomePage && "text-foreground")}>
+             <Button variant="ghost" asChild className={cn("transition-colors hover:text-foreground", isHomePage ? "text-foreground font-semibold border-b-2 border-primary rounded-none" : "text-muted-foreground")}>
                 <Link href="/">
                     <Home className="mr-2 h-4 w-4" />
                     Home
