@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 
 type UserProgressContextType = {
   totalExp: number;
@@ -16,18 +16,18 @@ export const UserProgressProvider = ({ children }: { children: ReactNode }) => {
   const [totalExp, setTotalExp] = useState(14); // Initial value
   const [completedLessons, setCompletedLessons] = useState<string[]>(['l1']); // Start with lesson 1 completed
 
-  const addExp = (amount: number) => {
+  const addExp = useCallback((amount: number) => {
     setTotalExp(prevExp => prevExp + amount);
-  };
+  }, []);
 
-  const completeLesson = (lessonId: string) => {
+  const completeLesson = useCallback((lessonId: string) => {
     setCompletedLessons(prev => {
         if (prev.includes(lessonId)) {
             return prev;
         }
         return [...prev, lessonId];
     });
-  }
+  }, []);
 
   return (
     <UserProgressContext.Provider value={{ totalExp, setTotalExp, addExp, completedLessons, completeLesson }}>
