@@ -1,12 +1,22 @@
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { BookOpen, BarChart2 } from 'lucide-react';
+import { allCourseData } from '@/lib/course-data';
 
 type CourseCardProps = {
   title: string;
   description: string;
   lessons: number;
 };
+
+// Calculate total exercises once
+const totalExercises = Object.values(allCourseData).reduce((total, lesson) => {
+    return total + lesson.steps.filter(step => 
+        step.type === 'question' || 
+        step.type.startsWith('interactive_')
+    ).length;
+}, 0);
+
 
 export function CourseCard({ title, description, lessons }: CourseCardProps) {
   return (
@@ -35,7 +45,7 @@ export function CourseCard({ title, description, lessons }: CourseCardProps) {
           </div>
           <div className="flex items-center">
             <BarChart2 className="mr-1.5 h-4 w-4" />
-            <span>20 Exercises</span>
+            <span>{totalExercises} Exercises</span>
           </div>
         </div>
       </CardContent>

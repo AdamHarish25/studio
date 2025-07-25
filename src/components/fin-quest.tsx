@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -8,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale, Award, ThumbsUp, ThumbsDown, GraduationCap, Briefcase, Handshake, ToyBrick, Landmark, TrendingUp } from 'lucide-react';
+import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale, Award, ThumbsUp, ThumbsDown, GraduationCap, Briefcase, Handshake, ToyBrick, Landmark, TrendingUp, Wallet, Banknote, Shield } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, ReferenceLine } from 'recharts';
 import { useUserProgress } from '@/context/user-progress-context';
 import type { LessonData, Step } from '@/lib/course-data';
@@ -39,7 +40,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
   const [sliderValue, setSliderValue] = useState(0);
   const [submittedAnswer, setSubmittedAnswer] = useState<number | null>(null);
   const [sortingChoice, setSortingChoice] = useState<'Good Debt' | 'Bad Debt' | null>(null);
-  const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
+  const [sortingScenarioIndex, setSortingScenarioIndex] = useState(0);
   const [riskReturnAllocation, setRiskReturnAllocation] = useState(50); // Percentage for investments
 
   const { addExp, completeLesson } = useUserProgress();
@@ -51,6 +52,14 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
     wants: 0,
     savings: 0,
   });
+
+   const [scenarioState, setScenarioState] = useState({
+    currentEventIndex: 0,
+    savings: 0,
+    debt: 0,
+    investments: 0,
+  });
+
 
   const currentStep: Step = lessonData.steps[currentStepIndex];
   const progress = ((currentStepIndex) / (lessonData.steps.length -1)) * 100;
@@ -77,9 +86,14 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
       setSliderValue(Math.min(...values));
     } else if (step.type === 'interactive_sorting') {
         // Randomize scenario on step load
-        setCurrentScenarioIndex(Math.floor(Math.random() * step.scenarios.length));
+        setSortingScenarioIndex(Math.floor(Math.random() * step.scenarios.length));
     } else if (step.type === 'interactive_risk_return') {
       setRiskReturnAllocation(50); // Reset to default 50/50 split
+    } else if (step.type === 'interactive_scenario') {
+      setScenarioState({
+        currentEventIndex: 0,
+        ...step.initialState,
+      });
     }
   }, [currentStepIndex, lessonData.steps]);
 
@@ -102,7 +116,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
   };
 
   const handleContinue = () => {
-    if (['lesson_intro', 'allocation_feedback', 'interactive_sandbox', 'interactive_risk_return'].includes(currentStep.type)) {
+    if (['lesson_intro', 'allocation_feedback', 'interactive_sandbox', 'interactive_risk_return', 'interactive_scenario'].includes(currentStep.type)) {
         setSessionExp(prev => prev + (currentStep.exp || 0));
     }
 
@@ -129,9 +143,9 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
         setSliderValue(Math.min(...values));
     } else if (step.type === 'interactive_sorting') {
         // Optional: pick a new scenario on try again
-        const newIndex = (currentScenarioIndex + 1) % step.scenarios.length;
+        const newIndex = (sortingScenarioIndex + 1) % step.scenarios.length;
         setSortingChoice(null);
-        setCurrentScenarioIndex(newIndex);
+        setSortingScenarioIndex(newIndex);
     }
   }
 
@@ -142,12 +156,12 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
     const step = lessonData.steps[currentStepIndex];
     if (step.type !== 'interactive_sorting') return;
 
-    const isCorrect = sortingChoice === step.scenarios[currentScenarioIndex].wiseChoice;
+    const isCorrect = sortingChoice === step.scenarios[sortingScenarioIndex].wiseChoice;
     if (isCorrect) {
         setSessionExp(prev => prev + (step.exp || 0));
     }
     setIsAnswered(true); // Now set isAnswered after processing the choice
-  }, [sortingChoice, currentStepIndex, lessonData.steps, currentScenarioIndex]);
+  }, [sortingChoice, currentStepIndex, lessonData.steps, sortingScenarioIndex]);
   
   const handleAllocateBudget = (bucket: keyof Omit<typeof sandboxState, 'remaining'>) => {
     const sandboxStep = lessonData.steps.find(s => s.type === 'interactive_sandbox');
@@ -178,6 +192,19 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
       // The logic is now handled by the useEffect hook that watches sortingChoice
   }
 
+  const handleScenarioChoice = (choice: any) => {
+    if (currentStep.type !== 'interactive_scenario') return;
+
+    // Apply impact
+    setScenarioState(prev => ({
+      ...prev,
+      savings: prev.savings + (choice.impact.savings || 0),
+      debt: prev.debt + (choice.impact.debt || 0),
+      investments: prev.investments + (choice.impact.investments || 0),
+      currentEventIndex: prev.currentEventIndex + 1,
+    }));
+  }
+
 
   const isCorrectInteractive = useMemo(() => {
     const step = lessonData.steps[currentStepIndex];
@@ -185,18 +212,21 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
         return submittedAnswer === step.correctAnswer;
     }
     if (step.type === 'interactive_sorting' && sortingChoice !== null) {
-        return sortingChoice === step.scenarios[currentScenarioIndex].wiseChoice;
+        return sortingChoice === step.scenarios[sortingScenarioIndex].wiseChoice;
     }
     return false;
-  }, [lessonData.steps, currentStepIndex, submittedAnswer, sortingChoice, currentScenarioIndex]);
+  }, [lessonData.steps, currentStepIndex, submittedAnswer, sortingChoice, sortingScenarioIndex]);
 
   const showContinueButton = useMemo(() => {
     if (['lesson_intro', 'allocation_feedback', 'interactive_risk_return'].includes(currentStep.type)) return true;
     if (currentStep.type === 'interactive_sandbox') return sandboxState.remaining === 0;
+    if (currentStep.type === 'interactive_scenario') {
+      return scenarioState.currentEventIndex >= currentStep.events.length;
+    }
     if (currentStep.type === 'question') return isAnswered && selectedOption?.isCorrect;
     if (['interactive_balance', 'interactive_sorting'].includes(currentStep.type)) return isAnswered && isCorrectInteractive;
     return false;
-  }, [currentStep.type, isAnswered, selectedOption, sandboxState.remaining, isCorrectInteractive]);
+  }, [currentStep.type, isAnswered, selectedOption, sandboxState.remaining, isCorrectInteractive, scenarioState, currentStep]);
 
   const showTryAgainButton = (currentStep.type === 'question' && isAnswered && !selectedOption?.isCorrect) || (['interactive_balance', 'interactive_sorting'].includes(currentStep.type) && isAnswered && !isCorrectInteractive);
 
@@ -332,7 +362,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
     case 'interactive_sorting': {
         const { scenarios } = currentStep;
-        const currentScenario = scenarios[currentScenarioIndex];
+        const currentScenario = scenarios[sortingScenarioIndex];
         const ScenarioIcon = iconMap[currentScenario.icon as keyof typeof iconMap] || ToyBrick;
 
         return (
@@ -519,6 +549,62 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
           </div>
         );
       }
+
+      case 'interactive_scenario': {
+        const { events } = currentStep;
+        const currentEvent = events[scenarioState.currentEventIndex];
+
+        if (!currentEvent) {
+          // All events are done, maybe show a summary before continue button appears
+          return (
+            <div className="text-center">
+              <h3 className="font-bold text-xl mb-4">Year End Summary</h3>
+              <p>You've navigated the challenges of the year. Check your final financial status below!</p>
+            </div>
+          );
+        }
+
+        return (
+          <div className="w-full flex flex-col items-center">
+             <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-center text-foreground">{currentStep.title}</h2>
+             {/* Dashboard */}
+            <div className="w-full grid grid-cols-3 gap-2 sm:gap-4 mb-8 text-center">
+              <Card className="p-2 sm:p-4">
+                <div className="flex justify-center items-center gap-2 mb-1"><Wallet className="h-5 w-5 text-green-600"/> <h3 className="text-sm font-bold text-muted-foreground">Savings</h3></div>
+                <p className="font-extrabold text-lg sm:text-xl text-foreground">{formatCurrency(scenarioState.savings)}</p>
+              </Card>
+              <Card className="p-2 sm:p-4">
+                <div className="flex justify-center items-center gap-2 mb-1"><Banknote className="h-5 w-5 text-red-600"/> <h3 className="text-sm font-bold text-muted-foreground">Debt</h3></div>
+                <p className="font-extrabold text-lg sm:text-xl text-foreground">{formatCurrency(scenarioState.debt)}</p>
+              </Card>
+              <Card className="p-2 sm:p-4">
+                <div className="flex justify-center items-center gap-2 mb-1"><TrendingUp className="h-5 w-5 text-blue-600"/> <h3 className="text-sm font-bold text-muted-foreground">Investments</h3></div>
+                <p className="font-extrabold text-lg sm:text-xl text-foreground">{formatCurrency(scenarioState.investments)}</p>
+              </Card>
+            </div>
+
+            {/* Event Card */}
+            <Card className="w-full p-6 shadow-soft border-primary/20">
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                        <Shield className="h-6 w-6 text-primary"/>
+                    </div>
+                    <div>
+                        <h3 className="font-extrabold text-xl text-foreground">{currentEvent.title}</h3>
+                        <p className="text-muted-foreground">{currentEvent.text}</p>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                    {currentEvent.choices.map((choice, index) => (
+                        <Button key={index} variant="outline" size="lg" className="h-auto p-4 justify-start" onClick={() => handleScenarioChoice(choice)}>
+                            {choice.text}
+                        </Button>
+                    ))}
+                </div>
+            </Card>
+          </div>
+        );
+      }
         
       case 'question':
         return (
@@ -573,9 +659,9 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
     } else if (currentStep.type === 'interactive_sorting') {
         isCorrect = isCorrectInteractive;
         if (!isCorrect) {
-          feedbackText = currentStep.scenarios[currentScenarioIndex].feedback.incorrect;
+          feedbackText = currentStep.scenarios[sortingScenarioIndex].feedback.incorrect;
         } else {
-          feedbackText = currentStep.scenarios[currentScenarioIndex].feedback.correct;
+          feedbackText = currentStep.scenarios[sortingScenarioIndex].feedback.correct;
         }
     }
      else {
@@ -652,5 +738,3 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
     </Card>
   );
 }
-
-    

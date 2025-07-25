@@ -1,5 +1,6 @@
 
 
+
 // --- Type Definitions ---
 type Option = {
   text: string;
@@ -71,12 +72,35 @@ type InteractiveRiskReturnStep = BaseStep & {
     };
 };
 
+type FinalScenarioEvent = {
+    title: string;
+    text: string;
+    choices: {
+        text: string;
+        impact: {
+            savings?: number;
+            debt?: number;
+            investments?: number;
+        };
+    }[];
+};
+
+type InteractiveScenarioStep = BaseStep & {
+    type: 'interactive_scenario';
+    initialState: {
+        savings: number;
+        debt: number;
+        investments: number;
+    };
+    events: FinalScenarioEvent[];
+};
+
 
 type FinalStep = BaseStep & {
   type: 'final';
 };
 
-export type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | InteractiveBalanceStep | AllocationFeedbackStep | InteractiveSortingStep | InteractiveRiskReturnStep;
+export type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | InteractiveBalanceStep | AllocationFeedbackStep | InteractiveSortingStep | InteractiveRiskReturnStep | InteractiveScenarioStep;
 
 export type LessonData = {
     title: string;
@@ -240,11 +264,60 @@ const savingsAndInvestments: LessonData = {
     ]
 };
 
+const finalReview: LessonData = {
+    id: 'l4',
+    title: "Final Review",
+    steps: [
+        {
+            type: 'lesson_intro',
+            title: 'The Final Challenge',
+            text: "It's time to put everything you've learned to the test. You will manage your finances through several life events. Your goal is to finish with a positive net worth. Good luck!",
+            illustration_url: 'https://i.imgur.com/pYqZzF1.png',
+            exp: 10,
+        },
+        {
+            type: 'interactive_scenario',
+            title: 'A Year in Your Financial Life',
+            text: "Make decisions to navigate the year. Each choice will impact your budget, debt, and investments.",
+            exp: 100,
+            initialState: {
+                savings: 2000000,
+                debt: 10000000,
+                investments: 0
+            },
+            events: [
+                {
+                    title: "Unexpected Expense",
+                    text: "Your laptop broke! A new one costs Rp 7,000,000. How do you pay for it?",
+                    choices: [
+                        { text: "Pay with savings.", impact: { savings: -7000000 } },
+                        { text: "Take a new high-interest loan.", impact: { debt: 7500000 } }
+                    ]
+                },
+                {
+                    title: "Investment Opportunity",
+                    text: "A friend offers you a chance to invest in their startup. It requires Rp 5,000,000.",
+                    choices: [
+                        { text: "Invest from savings.", impact: { savings: -5000000, investments: 5000000 } },
+                        { text: "Decline the opportunity.", impact: {} }
+                    ]
+                }
+            ]
+        },
+        {
+            type: 'final',
+            title: 'Challenge Complete!',
+            text: "Congratulations on completing your financial literacy journey! You now have the fundamental knowledge to build a secure financial future.",
+            exp: 0,
+        }
+    ]
+};
+
 export const allCourseData: AllCourseData = {
     'budgeting-basics': budgetingBasics,
     'understanding-debt': understandingDebt,
     'savings-and-investments': savingsAndInvestments,
-    'final-review': { title: "Final Review", id: 'l4', steps: [] },
+    'final-review': finalReview,
 }
 
 // --- LESSON MAP DATA (separate from lesson content) ---
@@ -302,5 +375,3 @@ export const courseData: CourseData = {
     },
   ],
 };
-
-    
