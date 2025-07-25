@@ -61,12 +61,22 @@ type InteractiveBalanceStep = BaseStep & {
     explanation?: string;
 };
 
+type InteractiveRiskReturnStep = BaseStep & {
+    type: 'interactive_risk_return';
+    totalAmount: number;
+    years: number;
+    options: {
+        savings: { name: string; annualReturn: number };
+        investments: { name: string; annualReturn: number };
+    };
+};
+
 
 type FinalStep = BaseStep & {
   type: 'final';
 };
 
-export type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | InteractiveBalanceStep | AllocationFeedbackStep | InteractiveSortingStep;
+export type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | InteractiveBalanceStep | AllocationFeedbackStep | InteractiveSortingStep | InteractiveRiskReturnStep;
 
 export type LessonData = {
     title: string;
@@ -187,11 +197,53 @@ const understandingDebt: LessonData = {
     ]
 };
 
+const savingsAndInvestments: LessonData = {
+    id: 'l3',
+    title: "Savings & Investments",
+    steps: [
+        {
+            type: 'lesson_intro',
+            title: 'Grow Your Money',
+            text: "Putting money aside is smart, but making it grow is even smarter. Let's explore the difference between saving and investing.",
+            illustration_url: 'https://i.imgur.com/G5VwB8A.png',
+            exp: 10
+        },
+        {
+            type: 'interactive_risk_return',
+            title: 'Risk & Return Simulator',
+            text: "You have Rp 10,000,000 to put aside for 5 years. Allocate it between a Safe Savings Account and Stock Investments to see the potential outcome.",
+            totalAmount: 10000000,
+            years: 5,
+            options: {
+                savings: { name: "Savings Account", annualReturn: 0.03 }, // 3% return
+                investments: { name: "Stock Market", annualReturn: 0.12 } // 12% potential return
+            },
+            exp: 50,
+        },
+        {
+            type: 'question',
+            title: 'The Magic of Compounding',
+            text: 'Compounding is when your interest starts earning its own interest. Which of these options benefits the MOST from compounding?',
+            options: [
+                { text: 'Saving Rp 1,000,000 for one year.', isCorrect: false, feedback: "Compounding needs time. One year is just the beginning." },
+                { text: 'Investing Rp 100,000 per month for 30 years.', isCorrect: true, feedback: 'Correct! The longer your money is invested, the more powerful the effect of compounding becomes.' },
+                { text: 'Keeping Rp 5,000,000 in cash under your bed.', isCorrect: false, feedback: "Cash that isn't invested or saved in an interest-bearing account doesn't compound at all." }
+            ],
+            exp: 25,
+        },
+        {
+            type: 'final',
+            title: 'Investor in the Making!',
+            text: "You've grasped the core concepts of making your money work for you. You're on the right path to building wealth.",
+            exp: 0
+        }
+    ]
+};
+
 export const allCourseData: AllCourseData = {
     'budgeting-basics': budgetingBasics,
     'understanding-debt': understandingDebt,
-    // Future lessons can be added here
-    'savings-and-investments': { title: "Savings & Investments", id: 'l3', steps: [] },
+    'savings-and-investments': savingsAndInvestments,
     'final-review': { title: "Final Review", id: 'l4', steps: [] },
 }
 
@@ -250,3 +302,5 @@ export const courseData: CourseData = {
     },
   ],
 };
+
+    
