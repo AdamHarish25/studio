@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -276,8 +275,8 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
                     height={400}
                     className="max-h-[200px] sm:max-h-[300px] object-contain mb-6 sm:mb-8 rounded-2xl"
                 />
-                <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{currentStep.title}</h2>
-                <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
+                <h2 className="font-extrabold text-2xl sm:text-3xl mb-4 text-foreground">{currentStep.title}</h2>
+                <p className="text-muted-foreground text-sm sm:text-base max-w-prose mb-8">{currentStep.text}</p>
             </div>
         );
 
@@ -290,8 +289,8 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
         ];
         return (
           <div className="flex flex-col items-center text-center w-full">
-            <h2 className="font-extrabold text-2xl sm:text-4xl mb-2 text-foreground">{currentStep.title}</h2>
-            <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-6">{currentStep.text}</p>
+            <h2 className="font-extrabold text-2xl sm:text-3xl mb-2 text-foreground">{currentStep.title}</h2>
+            <p className="text-muted-foreground text-sm sm:text-base max-w-prose mb-6">{currentStep.text}</p>
             
             <div id="money-pool" className="mb-8 p-4 bg-primary/10 rounded-2xl">
               <p className="text-sm font-bold text-primary">Money Pool</p>
@@ -358,8 +357,8 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
         return (
             <div className="flex flex-col items-center text-center w-full">
-                <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{currentStep.title}</h2>
-                <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
+                <h2 className="font-extrabold text-2xl sm:text-3xl mb-4 text-foreground">{currentStep.title}</h2>
+                <p className="text-muted-foreground text-sm sm:text-base max-w-prose mb-8">{currentStep.text}</p>
                 <div className="w-full max-w-lg space-y-4">
                     {results.map(result => (
                         <Card key={result.category} className="p-4 flex items-center justify-between">
@@ -387,8 +386,8 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
         return (
             <div className="flex flex-col items-center text-center w-full">
-                <h2 className="font-extrabold text-2xl sm:text-4xl mb-2 text-foreground">{currentStep.title}</h2>
-                <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
+                <h2 className="font-extrabold text-2xl sm:text-3xl mb-2 text-foreground">{currentStep.title}</h2>
+                <p className="text-muted-foreground text-sm sm:text-base max-w-prose mb-8">{currentStep.text}</p>
 
                 <Card className="p-6 mb-8 w-full max-w-md shadow-soft border-2 border-primary/20">
                     <div className="flex items-center justify-center space-x-4">
@@ -437,8 +436,8 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
           return (
               <div className="flex flex-col items-center text-center w-full">
-                  <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{currentStep.title}</h2>
-                  <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
+                  <h2 className="font-extrabold text-2xl sm:text-3xl mb-4 text-foreground">{currentStep.title}</h2>
+                  <p className="text-muted-foreground text-sm sm:text-base max-w-prose mb-8">{currentStep.text}</p>
                   
                    <div className="flex justify-center mb-4">
                       <div className="p-2 bg-card rounded-full shadow-md border">
@@ -515,8 +514,8 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
         return (
           <div className="w-full flex flex-col items-center">
-            <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-center text-foreground">{currentStep.title}</h2>
-            <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8 text-center">{currentStep.text}</p>
+            <h2 className="font-extrabold text-2xl sm:text-3xl mb-4 text-center text-foreground">{currentStep.title}</h2>
+            <p className="text-muted-foreground text-sm sm:text-base max-w-prose mb-8 text-center">{currentStep.text}</p>
             
             <div className="w-full grid grid-cols-2 gap-4 mb-4 text-center">
                 <Card className="p-4 bg-blue-500/10">
@@ -591,8 +590,8 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
                  <div className="p-4 bg-primary/10 rounded-full mb-6">
                     <Icon className="w-10 h-10 text-primary" />
                  </div>
-                <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{feedback.title}</h2>
-                <p className="text-muted-foreground text-base sm:text-lg">{feedback.text}</p>
+                <h2 className="font-extrabold text-2xl sm:text-3xl mb-4 text-foreground">{feedback.title}</h2>
+                <p className="text-muted-foreground text-sm sm:text-base">{feedback.text}</p>
             </div>
         )
       }
@@ -613,7 +612,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
         return (
           <div className="w-full flex flex-col items-center">
-             <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-center text-foreground">{currentStep.title}</h2>
+             <h2 className="font-extrabold text-2xl sm:text-3xl mb-4 text-center text-foreground">{currentStep.title}</h2>
              {/* Dashboard */}
             <div className="w-full grid grid-cols-3 gap-2 sm:gap-4 mb-8 text-center">
               <Card className="p-2 sm:p-4">
@@ -656,16 +655,16 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
       case 'question':
         return (
           <div className="flex flex-col items-center text-center">
-            <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{currentStep.title}</h2>
-            <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
-            <div className="w-full max-w-md space-y-4 mb-8">
+            <h2 className="font-extrabold text-2xl sm:text-3xl mb-4 text-foreground">{currentStep.title}</h2>
+            <p className="text-muted-foreground text-sm sm:text-base max-w-prose mb-8">{currentStep.text}</p>
+            <div className="w-full max-w-md space-y-3 sm:space-y-4 mb-8">
               {currentStep.options.map((option, index) => (
                 <Button
                   key={index}
                   onClick={() => handleOptionClick(option)}
                   disabled={isAnswered}
                   className={cn(
-                    "w-full h-auto justify-start p-4 text-left font-bold text-base sm:text-lg rounded-2xl transition-all duration-300 ease-in-out transform",
+                    "w-full h-auto justify-start p-3 sm:p-4 text-left font-bold text-sm sm:text-base rounded-xl sm:rounded-2xl transition-all duration-300 ease-in-out transform",
                     getOptionButtonClass(option)
                   )}
                 >
@@ -680,8 +679,8 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
         return (
           <div className="flex flex-col items-center text-center">
             <Award className="w-24 h-24 text-yellow-500 mb-6" />
-            <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{currentStep.title}</h2>
-            <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
+            <h2 className="font-extrabold text-2xl sm:text-3xl mb-4 text-foreground">{currentStep.title}</h2>
+            <p className="text-muted-foreground text-sm sm:text-base max-w-prose mb-8">{currentStep.text}</p>
             <div className="p-4 bg-primary/10 rounded-2xl">
                 <p className="text-sm font-bold text-primary">Total Experience Earned</p>
                 <p className="text-3xl font-extrabold text-primary">{sessionExp} XP</p>
@@ -740,11 +739,11 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
     <Card className="w-full max-w-3xl shadow-soft font-body">
       <CardHeader className="p-4 sm:p-6">
         <div className="flex justify-between items-center mb-4">
-          <CardTitle className="font-extrabold text-xl sm:text-3xl text-foreground">{lessonData.title}</CardTitle>
+          <CardTitle className="font-extrabold text-lg sm:text-2xl text-foreground">{lessonData.title}</CardTitle>
         </div>
         <Progress value={progress} className="w-full h-3 bg-accent" />
       </CardHeader>
-      <CardContent className="px-4 py-6 sm:p-10 flex flex-col items-center justify-between min-h-[450px] sm:min-h-[500px]">
+      <CardContent className="px-4 py-6 sm:p-8 flex flex-col items-center justify-between min-h-[450px] sm:min-h-[500px]">
         
         <div className="w-full flex-grow flex flex-col items-center justify-center">
             {renderContent()}
@@ -757,7 +756,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
             <Button 
               onClick={handleContinue} 
               size="lg"
-              className="w-full sm:w-auto font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform bg-primary hover:bg-accent-hover"
+              className="w-full sm:w-auto font-extrabold text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-xl sm:rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform bg-primary hover:bg-accent-hover"
             >
               {currentStep.type === 'lesson_intro' ? 'Start Learning' : 'Continue'}
             </Button>
@@ -767,7 +766,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
               onClick={handleTryAgain} 
               size="lg"
               variant="outline"
-              className="w-full sm:w-auto font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform hover:bg-accent-hover"
+              className="w-full sm:w-auto font-extrabold text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-xl sm:rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform hover:bg-accent-hover"
             >
               Try Again
             </Button>
@@ -813,3 +812,5 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
     </>
   );
 }
+
+    
