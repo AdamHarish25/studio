@@ -8,8 +8,8 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale, Lightbulb } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList, ReferenceLine } from 'recharts';
+import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale, Award } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, ReferenceLine } from 'recharts';
 
 
 // --- Type Definitions ---
@@ -23,6 +23,7 @@ type BaseStep = {
   title: string;
   text: string;
   explanation?: string;
+  exp: number;
 };
 
 type IntroStep = BaseStep & {
@@ -71,14 +72,16 @@ const moduleData = {
             type: 'lesson_intro' as 'lesson_intro',
             title: 'Budgeting Basics',
             text: "Your first salary is exciting! Let's learn how a simple budget can help you control your money and reach your goals.",
-            illustration_url: '/visualHead.jpeg'
+            illustration_url: 'https://i.imgur.com/3nL3gd7.png',
+            exp: 10,
         },
         {
             type: 'interactive_sandbox' as 'interactive_sandbox',
             title: 'Allocate Your Budget',
             text: 'You have Rp 5,000,000. Click on the buckets below to allocate your money in chunks of Rp 500,000 and see how it splits.',
             totalBudget: 5000000,
-            increment: 500000
+            increment: 500000,
+            exp: 50,
         },
         {
             type: 'allocation_feedback' as 'allocation_feedback',
@@ -88,7 +91,8 @@ const moduleData = {
                 needs: 50,
                 wants: 20,
                 savings: 30,
-            }
+            },
+            exp: 10,
         },
         {
             type: 'question' as 'question',
@@ -98,7 +102,8 @@ const moduleData = {
                 { text: 'Plan a vacation with friends.', isCorrect: false, feedback: "While fun, this is a 'want', not a 'need'. A solid financial base comes first!" },
                 { text: 'Create a budget plan.', isCorrect: true, feedback: 'Excellent! A budget is a map for your money. It tells your money where to go instead of wondering where it went.' },
                 { text: 'Buy the latest smartphone.', isCorrect: false, feedback: "Tempting! But impulsive big purchases can derail your financial goals before you even start." }
-            ]
+            ],
+            exp: 25,
         },
         {
             type: 'interactive_balance' as 'interactive_balance',
@@ -109,12 +114,14 @@ const moduleData = {
                 { name: 'Needs', value: 5000000 },
             ],
             correctAnswer: 4000000,
-            explanation: "The balance point isn't just the middle of the number line; it's the weighted average! With Needs (5M) having more weight than Wants (3M), the balance point is pulled closer to Needs. A budget is about balancing priorities, not just splitting things equally."
+            explanation: "The balance point isn't just the middle of the number line; it's the weighted average! With Needs (5M) having more weight than Wants (3M), the balance point is pulled closer to Needs. A budget is about balancing priorities, not just splitting things equally.",
+            exp: 50,
         },
         {
             type: 'final' as 'final',
             title: 'Well Done!',
-            text: 'You\'ve learned the basics of prioritizing and budgeting. You are now ready to make smarter financial decisions from day one. Keep this momentum going!'
+            text: 'You\'ve learned the basics of prioritizing and budgeting. You are now ready to make smarter financial decisions from day one. Keep this momentum going!',
+            exp: 0,
         }
     ]
 };
@@ -136,6 +143,7 @@ export function FinQuest() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [sliderValue, setSliderValue] = useState(0);
   const [submittedAnswer, setSubmittedAnswer] = useState<number | null>(null);
+  const [totalExp, setTotalExp] = useState(0);
 
   const [sandboxState, setSandboxState] = useState({
     remaining: 0,
@@ -153,8 +161,6 @@ export function FinQuest() {
     setSelectedOption(null);
     setSubmittedAnswer(null);
 
-    const sandboxStep = moduleData.steps.find(step => step.type === 'interactive_sandbox');
-
     if (currentStep.type === 'interactive_sandbox') {
       setSandboxState({
         remaining: currentStep.totalBudget,
@@ -162,13 +168,10 @@ export function FinQuest() {
         wants: 0,
         savings: 0,
       });
-    } else if (currentStep.type === 'allocation_feedback' && sandboxStep?.type === 'interactive_sandbox') {
-        // Persist sandbox state for the feedback screen
     } else if (currentStep.type === 'interactive_balance') {
       const { data } = currentStep;
       const values = data.map(d => d.value);
-      const min = Math.min(...values);
-      setSliderValue(min);
+      setSliderValue(Math.min(...values));
     }
   }, [currentStepIndex, currentStep]);
 
@@ -177,9 +180,16 @@ export function FinQuest() {
     if (isAnswered) return;
     setIsAnswered(true);
     setSelectedOption(option);
+    if(option.isCorrect) {
+        setTotalExp(prev => prev + (currentStep.exp || 0));
+    }
   };
 
   const handleContinue = () => {
+    if (currentStep.type === 'lesson_intro' || currentStep.type === 'allocation_feedback' || currentStep.type === 'interactive_sandbox') {
+        setTotalExp(prev => prev + (currentStep.exp || 0));
+    }
+
     if (currentStepIndex < moduleData.steps.length - 1) {
       setCurrentStepIndex(currentStepIndex + 1);
     }
@@ -187,6 +197,7 @@ export function FinQuest() {
   
   const handleRestart = () => {
     setCurrentStepIndex(0);
+    setTotalExp(0);
   }
 
   const handleTryAgain = () => {
@@ -196,8 +207,7 @@ export function FinQuest() {
     if (currentStep.type === 'interactive_balance') {
         const { data } = currentStep;
         const values = data.map(d => d.value);
-        const min = Math.min(...values);
-        setSliderValue(min);
+        setSliderValue(Math.min(...values));
     }
   }
   
@@ -216,9 +226,15 @@ export function FinQuest() {
       if (isAnswered) return;
       setIsAnswered(true);
       setSubmittedAnswer(sliderValue);
+      if (sliderValue === (currentStep as InteractiveBalanceStep).correctAnswer) {
+          setTotalExp(prev => prev + (currentStep.exp || 0));
+      }
   };
 
-  const isCorrectInteractive = currentStep.type === 'interactive_balance' && submittedAnswer !== null && submittedAnswer === currentStep.correctAnswer;
+  const isCorrectInteractive = useMemo(() => 
+    currentStep.type === 'interactive_balance' && submittedAnswer !== null && submittedAnswer === currentStep.correctAnswer,
+    [currentStep, submittedAnswer]
+  );
 
   const showContinueButton = useMemo(() => {
     if (currentStep.type === 'lesson_intro') return true;
@@ -401,9 +417,16 @@ export function FinQuest() {
                               </Bar>
                               {isAnswered && (
                                 <ReferenceLine 
-                                  x={isCorrectInteractive ? undefined : chartData.find(d => d.value === submittedAnswer)?.label}
+                                  x={chartData.find(d => d.value === submittedAnswer)?.label}
                                   stroke={isCorrectInteractive ? "hsl(var(--primary))" : "hsl(var(--destructive))"} 
                                   strokeWidth={2}
+                                  label={{ 
+                                      value: isCorrectInteractive ? 'Balanced!' : 'Try Again',
+                                      position: 'insideTop', 
+                                      fill: isCorrectInteractive ? 'hsl(var(--primary))' : 'hsl(var(--destructive))',
+                                      fontSize: 14,
+                                      fontWeight: 'bold'
+                                  }}
                                 />
                               )}
                           </BarChart>
@@ -455,8 +478,13 @@ export function FinQuest() {
       case 'final':
         return (
           <div className="flex flex-col items-center text-center">
+            <Award className="w-24 h-24 text-yellow-500 mb-6" />
             <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{currentStep.title}</h2>
             <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
+            <div className="p-4 bg-primary/10 rounded-2xl">
+                <p className="text-sm font-bold text-primary">Total Experience Earned</p>
+                <p className="text-3xl font-extrabold text-primary">{totalExp} XP</p>
+            </div>
           </div>
         );
     }

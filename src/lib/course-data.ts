@@ -3,7 +3,7 @@ export type Lesson = {
   level: number;
   title: string;
   slug: string;
-  icon: string; // Changed from React.ElementType to string
+  icon: string;
   status: 'locked' | 'current' | 'completed';
   description: string;
 };
@@ -25,7 +25,7 @@ export const courseData: CourseData = {
       title: 'Budgeting Basics',
       slug: 'budgeting-basics',
       icon: 'Flame',
-      status: 'current',
+      status: 'completed',
       description: "Learn how a simple budget can help you control your money and reach your goals."
     },
     {
@@ -34,7 +34,7 @@ export const courseData: CourseData = {
       title: 'Understanding Debt',
       slug: 'understanding-debt',
       icon: 'Scale',
-      status: 'locked',
+      status: 'current',
       description: "Not all debt is created equal. Learn to distinguish between good and bad debt."
     },
     {

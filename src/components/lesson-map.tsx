@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { Lesson } from '@/lib/course-data';
-import { Flame, Landmark, Scale, Milestone, LucideProps } from 'lucide-react';
+import { Flame, Landmark, Scale, Milestone, LucideProps, CheckCircle } from 'lucide-react';
 
 type LessonMapProps = {
   lessons: Lesson[];
@@ -34,6 +34,7 @@ export function LessonMap({ lessons }: LessonMapProps) {
         {lessons.map(lesson => {
           const isSelected = selectedLesson?.id === lesson.id;
           const isLocked = lesson.status === 'locked';
+          const isCompleted = lesson.status === 'completed';
           const Icon = iconMap[lesson.icon];
 
           return (
@@ -51,16 +52,20 @@ export function LessonMap({ lessons }: LessonMapProps) {
                 )}
               />
               
-              <div className="z-10">
+              <div className="z-10 relative">
                 <div
                   className={cn(
                     'flex h-12 w-12 items-center justify-center rounded-full bg-background border-2 transition-all cursor-pointer',
                     isSelected && 'border-primary ring-4 ring-primary/20 scale-110',
-                    isLocked ? 'border-muted bg-muted' : 'border-border hover:border-primary'
+                    isLocked ? 'border-muted bg-muted' : 'border-border hover:border-primary',
+                    isCompleted && 'border-green-500 bg-green-500/10'
                   )}
                 >
-                  {Icon && <Icon className={cn('h-6 w-6', isLocked ? 'text-muted-foreground' : 'text-primary')} />}
+                  {Icon && <Icon className={cn('h-6 w-6', isLocked ? 'text-muted-foreground' : isCompleted ? 'text-green-500' : 'text-primary')} />}
                 </div>
+                 {isCompleted && (
+                    <CheckCircle className="absolute -bottom-1 -right-1 h-5 w-5 bg-background text-green-600 rounded-full" />
+                 )}
               </div>
 
               <div className="ml-8 flex-1">
@@ -88,8 +93,10 @@ export function LessonMap({ lessons }: LessonMapProps) {
               <h3 className="font-bold">{selectedLesson.title}</h3>
               <p className="text-sm text-muted-foreground">{selectedLesson.description}</p>
             </div>
-            <Button asChild size="lg">
-              <Link href={`/lesson/${selectedLesson.slug}`}>Start</Link>
+            <Button asChild size="lg" disabled={selectedLesson.status === 'locked'}>
+              <Link href={`/lesson/${selectedLesson.slug}`}>
+                {selectedLesson.status === 'completed' ? 'Review' : 'Start'}
+              </Link>
             </Button>
           </CardContent>
         </Card>
