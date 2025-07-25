@@ -161,8 +161,20 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
   const handleSortingClick = (choice: 'Good Debt' | 'Bad Debt') => {
       if (isAnswered) return;
       setSortingChoice(choice);
-      handleSubmitInteractive(); // Auto-submit on choice
+      // Auto-submit on choice, but need to update state before checking correctness
   }
+
+  // Effect to handle submission after sorting choice is set
+  useEffect(() => {
+    if (sortingChoice !== null && currentStep.type === 'interactive_sorting' && !isAnswered) {
+        setIsAnswered(true);
+        const isCorrect = sortingChoice === currentStep.scenarios[currentScenarioIndex].wiseChoice;
+        if (isCorrect) {
+            addExp(currentStep.exp || 0);
+            setSessionExp(prev => prev + (currentStep.exp || 0));
+        }
+    }
+  }, [sortingChoice, currentStep, isAnswered, addExp, setSessionExp, currentScenarioIndex]);
 
 
   const isCorrectInteractive = useMemo(() => {
