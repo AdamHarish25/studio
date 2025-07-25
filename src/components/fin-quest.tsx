@@ -81,8 +81,9 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
         setCurrentScenarioIndex(Math.floor(Math.random() * step.scenarios.length));
     } else if (step.type === 'final') {
         completeLesson(lessonId);
+        addExp(sessionExp);
     }
-  }, [currentStepIndex, lessonData.steps, completeLesson, lessonId]);
+  }, [currentStepIndex, lessonData.steps, completeLesson, lessonId, sessionExp, addExp]);
 
   // Handle awarding EXP for sorting questions after state has been updated
   useEffect(() => {
@@ -90,11 +91,10 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
         setIsAnswered(true);
         const isCorrect = sortingChoice === currentStep.scenarios[currentScenarioIndex].wiseChoice;
         if (isCorrect) {
-            addExp(currentStep.exp || 0);
             setSessionExp(prev => prev + (currentStep.exp || 0));
         }
     }
-  }, [sortingChoice, currentStep, currentScenarioIndex, addExp]);
+  }, [sortingChoice, currentStep, currentScenarioIndex]);
 
 
   const handleOptionClick = (option: any) => {
@@ -102,14 +102,12 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
     setIsAnswered(true);
     setSelectedOption(option);
     if(option.isCorrect) {
-        addExp(currentStep.exp || 0);
         setSessionExp(prev => prev + (currentStep.exp || 0));
     }
   };
 
   const handleContinue = () => {
     if (['lesson_intro', 'allocation_feedback', 'interactive_sandbox'].includes(currentStep.type)) {
-        addExp(currentStep.exp || 0);
         setSessionExp(prev => prev + (currentStep.exp || 0));
     }
 
@@ -159,7 +157,6 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
           setIsAnswered(true);
           setSubmittedAnswer(sliderValue);
           if (sliderValue === currentStep.correctAnswer) {
-              addExp(currentStep.exp || 0);
               setSessionExp(prev => prev + (currentStep.exp || 0));
           }
       }
@@ -559,3 +556,5 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
     </Card>
   );
 }
+
+    
