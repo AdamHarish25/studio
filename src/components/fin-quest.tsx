@@ -46,7 +46,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
   // Lifted state for risk/return
   const [riskReturnAllocation, setRiskReturnAllocation] = useState(50); // Percentage for investments
 
-  const { addExp, completeLesson } = useUserProgress();
+  const { addExp, completeLesson, completedLessons } = useUserProgress();
   const [sessionExp, setSessionExp] = useState(0);
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [feedbackContent, setFeedbackContent] = useState<{ title: string; description: string; action: () => void } | null>(null);
@@ -106,10 +106,13 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
   // Mark lesson as complete when final step is reached
    useEffect(() => {
     if (currentStep.type === 'final') {
-      addExp(sessionExp);
-      completeLesson(lessonId);
+        // Check if the lesson is already completed before awarding EXP
+        if (!completedLessons.includes(lessonId)) {
+            addExp(sessionExp);
+            completeLesson(lessonId);
+        }
     }
-  }, [currentStep, lessonId, completeLesson, sessionExp, addExp]);
+  }, [currentStep, lessonId, completeLesson, sessionExp, addExp, completedLessons]);
 
 
   const handleOptionClick = (option: any) => {
