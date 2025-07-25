@@ -612,9 +612,9 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
         return (
           <div className="w-full flex flex-col items-center">
-             <h2 className="font-extrabold text-2xl sm:text-3xl mb-4 text-center text-foreground">{currentStep.title}</h2>
+             <h2 className="font-extrabold text-xl sm:text-2xl mb-4 text-center text-foreground">{currentStep.title}</h2>
              {/* Dashboard */}
-            <div className="w-full grid grid-cols-3 gap-2 sm:gap-4 mb-8 text-center">
+            <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4 mb-6 text-center">
               <Card className="p-2 sm:p-4">
                 <div className="flex justify-center items-center gap-2 mb-1"><Wallet className="h-5 w-5 text-green-600"/> <h3 className="text-sm font-bold text-muted-foreground">Savings</h3></div>
                 <p className="font-extrabold text-lg sm:text-xl text-foreground">{formatCurrency(scenarioState.savings)}</p>
@@ -630,19 +630,19 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
             </div>
 
             {/* Event Card */}
-            <Card className="w-full p-6 shadow-soft border-primary/20">
-                <div className="flex items-center gap-4 mb-4">
-                    <div className="p-3 bg-primary/10 rounded-full">
+            <Card className="w-full p-4 sm:p-6 shadow-soft border-primary/20">
+                <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+                    <div className="p-3 bg-primary/10 rounded-full flex-shrink-0">
                         <Shield className="h-6 w-6 text-primary"/>
                     </div>
-                    <div>
+                    <div className="text-center sm:text-left">
                         <h3 className="font-extrabold text-lg sm:text-xl text-foreground">{currentEvent.title}</h3>
-                        <p className="text-muted-foreground">{currentEvent.text}</p>
+                        <p className="text-muted-foreground text-sm sm:text-base">{currentEvent.text}</p>
                     </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mt-4">
                     {currentEvent.choices.map((choice, index) => (
-                        <Button key={index} variant="outline" size="lg" className="h-auto p-4 justify-start text-left" onClick={() => handleScenarioChoice(choice)}>
+                        <Button key={index} variant="outline" size="lg" className="h-auto p-3 text-sm sm:p-4 sm:text-base justify-center text-center sm:justify-start sm:text-left" onClick={() => handleScenarioChoice(choice)}>
                             {choice.text}
                         </Button>
                     ))}
@@ -743,7 +743,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
         </div>
         <Progress value={progress} className="w-full h-3 bg-accent" />
       </CardHeader>
-      <CardContent className="px-4 py-6 sm:p-8 flex flex-col items-center justify-between min-h-[450px] sm:min-h-[500px]">
+      <CardContent className="px-4 py-6 sm:p-6 flex flex-col items-center justify-between min-h-[450px] sm:min-h-[500px]">
         
         <div className="w-full flex-grow flex flex-col items-center justify-center">
             {renderContent()}
@@ -812,5 +812,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
     </>
   );
 }
+
+    
 
     
