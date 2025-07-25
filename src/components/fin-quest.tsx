@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
@@ -33,7 +32,7 @@ const iconMap = {
 }
 
 // --- Main Component ---
-export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, lessonId: string }) {
+export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; lessonId: string }) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<any | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -79,11 +78,16 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
     } else if (step.type === 'interactive_sorting') {
         // Randomize scenario on step load
         setCurrentScenarioIndex(Math.floor(Math.random() * step.scenarios.length));
-    } else if (step.type === 'final') {
-        completeLesson(lessonId);
-        addExp(sessionExp);
     }
-  }, [currentStepIndex, lessonData.steps, completeLesson, lessonId, sessionExp, addExp]);
+  }, [currentStepIndex, lessonData.steps]);
+
+  // Mark lesson as complete when final step is reached
+  useEffect(() => {
+    if (currentStep.type === 'final') {
+      addExp(sessionExp);
+      completeLesson(lessonId);
+    }
+  }, [currentStep, lessonId, completeLesson, sessionExp, addExp]);
 
 
   const handleOptionClick = (option: any) => {
@@ -96,6 +100,10 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
   };
 
   const handleContinue = () => {
+    if (['lesson_intro', 'allocation_feedback', 'interactive_sandbox'].includes(currentStep.type)) {
+        setSessionExp(prev => prev + (currentStep.exp || 0));
+    }
+
     if (currentStepIndex < lessonData.steps.length - 1) {
       setCurrentStepIndex(currentStepIndex + 1);
     }
@@ -156,6 +164,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
           setSessionExp(prev => prev + (currentStep.exp || 0));
       }
   }
+
 
   const isCorrectInteractive = useMemo(() => {
     if (currentStep.type === 'interactive_balance' && submittedAnswer !== null) {
@@ -546,7 +555,3 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
     </Card>
   );
 }
-
-    
-
-    
