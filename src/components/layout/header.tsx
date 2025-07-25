@@ -1,8 +1,12 @@
+"use client";
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Home, BookOpen, Menu, Zap, Gem } from 'lucide-react';
+import { useUserProgress } from '@/context/user-progress-context';
 
 export function Header() {
+  const { totalExp } = useUserProgress();
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center">
@@ -35,7 +39,7 @@ export function Header() {
           </div>
           <nav className="flex items-center">
             <Button variant="outline" className="mr-2 hidden sm:flex">
-                <Zap className="mr-2 h-4 w-4 text-yellow-500"/> 14
+                <Zap className="mr-2 h-4 w-4 text-yellow-500"/> {totalExp}
             </Button>
              <Button variant="secondary" className="hidden sm:flex">
               Go Premium

@@ -1,6 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
+import { UserProgressProvider } from '@/context/user-progress-context';
 
 export const metadata: Metadata = {
   title: 'FinQuest: Budget Basics',
@@ -20,8 +21,10 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased font-semibold">
-        {children}
-        <Toaster />
+        <UserProgressProvider>
+            {children}
+            <Toaster />
+        </UserProgressProvider>
       </body>
     </html>
   );

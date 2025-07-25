@@ -10,6 +10,7 @@ import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale, Award } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, ReferenceLine } from 'recharts';
+import { useUserProgress } from '@/context/user-progress-context';
 
 
 // --- Type Definitions ---
@@ -143,7 +144,9 @@ export function FinQuest() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [sliderValue, setSliderValue] = useState(0);
   const [submittedAnswer, setSubmittedAnswer] = useState<number | null>(null);
-  const [totalExp, setTotalExp] = useState(0);
+
+  const { addExp, setTotalExp } = useUserProgress();
+  const [sessionExp, setSessionExp] = useState(0);
 
   const [sandboxState, setSandboxState] = useState({
     remaining: 0,
@@ -181,13 +184,15 @@ export function FinQuest() {
     setIsAnswered(true);
     setSelectedOption(option);
     if(option.isCorrect) {
-        setTotalExp(prev => prev + (currentStep.exp || 0));
+        addExp(currentStep.exp || 0);
+        setSessionExp(prev => prev + (currentStep.exp || 0));
     }
   };
 
   const handleContinue = () => {
     if (currentStep.type === 'lesson_intro' || currentStep.type === 'allocation_feedback' || currentStep.type === 'interactive_sandbox') {
-        setTotalExp(prev => prev + (currentStep.exp || 0));
+        addExp(currentStep.exp || 0);
+        setSessionExp(prev => prev + (currentStep.exp || 0));
     }
 
     if (currentStepIndex < moduleData.steps.length - 1) {
@@ -197,7 +202,7 @@ export function FinQuest() {
   
   const handleRestart = () => {
     setCurrentStepIndex(0);
-    setTotalExp(0);
+    setSessionExp(0);
   }
 
   const handleTryAgain = () => {
@@ -227,7 +232,8 @@ export function FinQuest() {
       setIsAnswered(true);
       setSubmittedAnswer(sliderValue);
       if (sliderValue === (currentStep as InteractiveBalanceStep).correctAnswer) {
-          setTotalExp(prev => prev + (currentStep.exp || 0));
+          addExp(currentStep.exp || 0);
+          setSessionExp(prev => prev + (currentStep.exp || 0));
       }
   };
 
@@ -483,7 +489,7 @@ export function FinQuest() {
             <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
             <div className="p-4 bg-primary/10 rounded-2xl">
                 <p className="text-sm font-bold text-primary">Total Experience Earned</p>
-                <p className="text-3xl font-extrabold text-primary">{totalExp} XP</p>
+                <p className="text-3xl font-extrabold text-primary">{sessionExp} XP</p>
             </div>
           </div>
         );
