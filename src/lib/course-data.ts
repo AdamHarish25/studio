@@ -2,6 +2,7 @@
 
 
 
+
 // --- Type Definitions ---
 type Option = {
   text: string;
@@ -73,6 +74,16 @@ type InteractiveRiskReturnStep = BaseStep & {
     };
 };
 
+type RiskReturnFeedbackStep = BaseStep & {
+    type: 'risk_return_feedback';
+    feedback: {
+        highRisk: { title: string; text: string };
+        lowRisk: { title: string; text: string };
+        balanced: { title: string; text: string };
+    }
+}
+
+
 type FinalScenarioEvent = {
     title: string;
     text: string;
@@ -84,6 +95,8 @@ type FinalScenarioEvent = {
             investments?: number;
         };
         feedback: string;
+        isWiseChoice: boolean;
+        exp: number;
     }[];
 };
 
@@ -102,7 +115,7 @@ type FinalStep = BaseStep & {
   type: 'final';
 };
 
-export type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | InteractiveBalanceStep | AllocationFeedbackStep | InteractiveSortingStep | InteractiveRiskReturnStep | InteractiveScenarioStep;
+export type Step = IntroStep | SandboxStep | QuestionStep | FinalStep | InteractiveBalanceStep | AllocationFeedbackStep | InteractiveSortingStep | InteractiveRiskReturnStep | InteractiveScenarioStep | RiskReturnFeedbackStep;
 
 export type LessonData = {
     title: string;
@@ -247,6 +260,26 @@ const savingsAndInvestments: LessonData = {
             exp: 50,
         },
         {
+            type: 'risk_return_feedback',
+            title: 'Your Strategy Analysis',
+            text: "Based on your allocation, here's an analysis of your investment strategy.",
+            exp: 10,
+            feedback: {
+                highRisk: {
+                    title: "Aggressive Growth",
+                    text: "You're aiming for high growth by taking on more risk! This could lead to big rewards, but be prepared for potential volatility. It's a strategy that suits those with a long time horizon."
+                },
+                lowRisk: {
+                    title: "Capital Preservation",
+                    text: "You're playing it safe, prioritizing protecting your money over high returns. This is a great strategy for short-term goals or for those who are uncomfortable with market swings."
+                },
+                balanced: {
+                    title: "Balanced Approach",
+                    text: "You've chosen a middle path, balancing the safety of savings with the growth potential of investments. This is a common and sensible strategy for steady, long-term growth."
+                }
+            }
+        },
+        {
             type: 'question',
             title: 'The Magic of Compounding',
             text: 'Compounding is when your interest starts earning its own interest. Which of these options benefits the MOST from compounding?',
@@ -281,7 +314,7 @@ const finalReview: LessonData = {
             type: 'interactive_scenario',
             title: 'A Year in Your Financial Life',
             text: "Make decisions to navigate the year. Each choice will impact your budget, debt, and investments.",
-            exp: 100,
+            exp: 0, // Exp is awarded per choice
             initialState: {
                 savings: 2000000,
                 debt: 10000000,
@@ -292,16 +325,16 @@ const finalReview: LessonData = {
                     title: "Unexpected Expense",
                     text: "Your laptop broke! A new one costs Rp 7,000,000. How do you pay for it?",
                     choices: [
-                        { text: "Pay with savings.", impact: { savings: -7000000 }, feedback: "Good choice! Using your savings means you avoid taking on new, high-interest debt. It's a tough hit to your savings, but financially sound. This is what an emergency fund is for!" },
-                        { text: "Take a new high-interest loan.", impact: { debt: 7500000 }, feedback: "This is a quick fix, but it's costly. The high interest means you'll pay back much more than the laptop is worth. This is 'bad debt' that can trap you in a cycle of payments." }
+                        { text: "Pay with savings.", impact: { savings: -7000000 }, feedback: "Good choice! Using your emergency savings for an emergency means you avoid taking on new, high-interest debt. It's a tough hit to your savings, but financially sound.", isWiseChoice: true, exp: 50 },
+                        { text: "Take a new high-interest loan.", impact: { debt: 7500000 }, feedback: "This is a quick fix, but it's costly. The high interest means you'll pay back much more than the laptop is worth. This is 'bad debt' that can trap you in a cycle of payments.", isWiseChoice: false, exp: 10 }
                     ]
                 },
                 {
                     title: "Investment Opportunity",
                     text: "A friend offers you a chance to invest in their startup. It requires Rp 5,000,000.",
                     choices: [
-                        { text: "Invest from savings.", impact: { savings: -5000000, investments: 5000000 }, feedback: "This is a classic risk-vs-reward scenario. Investing in a startup is risky, but the potential for a high return is there. Using savings shows you're willing to take a calculated risk for future growth." },
-                        { text: "Decline the opportunity.", impact: {}, feedback: "This is the safer option. You protect your savings and avoid a risky venture. While you miss out on potential gains, you also avoid potential losses. There's nothing wrong with being cautious!" }
+                        { text: "Invest from savings.", impact: { savings: -5000000, investments: 5000000 }, feedback: "This is a classic risk-vs-reward scenario. Investing in a startup is risky, but the potential for a high return is there. Using savings shows you're willing to take a calculated risk for future growth.", isWiseChoice: true, exp: 50 },
+                        { text: "Decline the opportunity.", impact: {}, feedback: "This is the safer option. You protect your savings and avoid a risky venture. While you miss out on potential gains, you also avoid potential losses. There's nothing wrong with being cautious!", isWiseChoice: true, exp: 25 }
                     ]
                 }
             ]

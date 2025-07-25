@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
-import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale, Award, ThumbsUp, ThumbsDown, GraduationCap, Briefcase, Handshake, ToyBrick, Landmark, TrendingUp, Wallet, Banknote, Shield } from 'lucide-react';
+import { CheckCircle, XCircle, PiggyBank, ShoppingCart, Home, Scale, Award, ThumbsUp, ThumbsDown, GraduationCap, Briefcase, Handshake, ToyBrick, Landmark, TrendingUp, Wallet, Banknote, Shield, LineChart, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, ReferenceLine } from 'recharts';
 import { useUserProgress } from '@/context/user-progress-context';
 import type { LessonData, Step } from '@/lib/course-data';
@@ -42,6 +42,8 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
   const [submittedAnswer, setSubmittedAnswer] = useState<number | null>(null);
   const [sortingChoice, setSortingChoice] = useState<'Good Debt' | 'Bad Debt' | null>(null);
   const [sortingScenarioIndex, setSortingScenarioIndex] = useState(0);
+  
+  // Lifted state for risk/return
   const [riskReturnAllocation, setRiskReturnAllocation] = useState(50); // Percentage for investments
 
   const { addExp, completeLesson } = useUserProgress();
@@ -92,7 +94,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
         // Randomize scenario on step load
         setSortingScenarioIndex(Math.floor(Math.random() * step.scenarios.length));
     } else if (step.type === 'interactive_risk_return') {
-      setRiskReturnAllocation(50); // Reset to default 50/50 split
+      // Don't reset riskReturnAllocation here, so it persists
     } else if (step.type === 'interactive_scenario') {
       setScenarioState({
         currentEventIndex: 0,
@@ -114,13 +116,15 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
     if (isAnswered) return;
     setIsAnswered(true);
     setSelectedOption(option);
-    if(option.isCorrect) {
-        setSessionExp(prev => prev + (currentStep.exp || 0));
-    }
   };
 
   const handleContinue = () => {
-    if (['lesson_intro', 'allocation_feedback', 'interactive_sandbox', 'interactive_risk_return', 'interactive_scenario'].includes(currentStep.type)) {
+    if (['question', 'interactive_balance', 'interactive_sorting'].includes(currentStep.type)) {
+       const isCorrect = currentStep.type === 'question' ? selectedOption?.isCorrect : isCorrectInteractive;
+       if(isCorrect) {
+            setSessionExp(prev => prev + (currentStep.exp || 0));
+       }
+    } else {
         setSessionExp(prev => prev + (currentStep.exp || 0));
     }
 
@@ -159,11 +163,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
 
     const step = lessonData.steps[currentStepIndex];
     if (step.type !== 'interactive_sorting') return;
-
-    const isCorrect = sortingChoice === step.scenarios[sortingScenarioIndex].wiseChoice;
-    if (isCorrect) {
-        setSessionExp(prev => prev + (step.exp || 0));
-    }
+    
     setIsAnswered(true); // Now set isAnswered after processing the choice
   }, [sortingChoice, currentStepIndex, lessonData.steps, sortingScenarioIndex]);
   
@@ -184,9 +184,6 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
       if (currentStep.type === 'interactive_balance') {
           setIsAnswered(true);
           setSubmittedAnswer(sliderValue);
-          if (sliderValue === currentStep.correctAnswer) {
-              setSessionExp(prev => prev + (currentStep.exp || 0));
-          }
       }
   };
 
@@ -208,11 +205,12 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
         investments: prev.investments + (choice.impact.investments || 0),
         currentEventIndex: prev.currentEventIndex + 1,
       }));
+       setSessionExp(prev => prev + (choice.exp || 0));
     };
   
     // Show feedback dialog
     setFeedbackContent({
-      title: "Decision Breakdown",
+      title: choice.isWiseChoice ? "Wise Decision!" : "Risky Move!",
       description: choice.feedback,
       action: applyChanges
     });
@@ -232,17 +230,22 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
   }, [lessonData.steps, currentStepIndex, submittedAnswer, sortingChoice, sortingScenarioIndex]);
 
   const showContinueButton = useMemo(() => {
-    if (['lesson_intro', 'allocation_feedback', 'interactive_risk_return'].includes(currentStep.type)) return true;
+    if (['lesson_intro', 'allocation_feedback', 'interactive_risk_return', 'risk_return_feedback'].includes(currentStep.type)) return true;
     if (currentStep.type === 'interactive_sandbox') return sandboxState.remaining === 0;
     if (currentStep.type === 'interactive_scenario') {
       return scenarioState.currentEventIndex >= currentStep.events.length;
     }
-    if (currentStep.type === 'question') return isAnswered && selectedOption?.isCorrect;
-    if (['interactive_balance', 'interactive_sorting'].includes(currentStep.type)) return isAnswered && isCorrectInteractive;
+    if (currentStep.type === 'question') return isAnswered;
+    if (['interactive_balance', 'interactive_sorting'].includes(currentStep.type)) return isAnswered;
     return false;
-  }, [currentStep.type, isAnswered, selectedOption, sandboxState.remaining, isCorrectInteractive, scenarioState, currentStep]);
+  }, [currentStep.type, isAnswered, sandboxState.remaining, isCorrectInteractive, scenarioState, currentStep]);
 
-  const showTryAgainButton = (currentStep.type === 'question' && isAnswered && !selectedOption?.isCorrect) || (['interactive_balance', 'interactive_sorting'].includes(currentStep.type) && isAnswered && !isCorrectInteractive);
+  const showTryAgainButton = useMemo(() => {
+    if (currentStep.type === 'question') return isAnswered && !selectedOption?.isCorrect;
+    if (['interactive_balance', 'interactive_sorting'].includes(currentStep.type)) return isAnswered && !isCorrectInteractive;
+    return false;
+  }, [currentStep, isAnswered, selectedOption, isCorrectInteractive]);
+
 
   const getOptionButtonClass = (option: any) => {
     if (!isAnswered) {
@@ -563,6 +566,33 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
           </div>
         );
       }
+      
+      case 'risk_return_feedback': {
+        const { highRisk, lowRisk, balanced } = currentStep.feedback;
+        let feedback;
+        let Icon;
+
+        if (riskReturnAllocation > 70) {
+            feedback = highRisk;
+            Icon = TrendingUp;
+        } else if (riskReturnAllocation < 30) {
+            feedback = lowRisk;
+            Icon = Landmark;
+        } else {
+            feedback = balanced;
+            Icon = Activity;
+        }
+        
+        return (
+            <div className="flex flex-col items-center text-center w-full max-w-lg">
+                 <div className="p-4 bg-primary/10 rounded-full mb-6">
+                    <Icon className="w-10 h-10 text-primary" />
+                 </div>
+                <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{feedback.title}</h2>
+                <p className="text-muted-foreground text-base sm:text-lg">{feedback.text}</p>
+            </div>
+        )
+      }
 
       case 'interactive_scenario': {
         const { events } = currentStep;
@@ -716,7 +746,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
         <div className="w-full flex-grow flex flex-col items-center justify-center">
             {renderContent()}
 
-            {isAnswered && renderFeedback()}
+            {isAnswered && (currentStep.type === 'question' || currentStep.type === 'interactive_balance' || currentStep.type === 'interactive_sorting') && renderFeedback()}
         </div>
 
         <div className="mt-8 pt-4">
@@ -740,13 +770,19 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
             </Button>
           )}
            {currentStep.type === 'final' && (
-            <Button 
-              onClick={handleRestart} 
-              size="lg"
-              className="font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform bg-primary hover:bg-accent-hover"
-            >
-              Start Over
-            </Button>
+            <div className="flex gap-4">
+                <Button asChild size="lg" className="font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform bg-primary hover:bg-accent-hover">
+                    <a href="/">Back to Courses</a>
+                </Button>
+                <Button 
+                    onClick={handleRestart} 
+                    size="lg"
+                    variant="outline"
+                    className="font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform hover:bg-accent-hover"
+                    >
+                    Start Over
+                </Button>
+            </div>
           )}
         </div>
       </CardContent>
