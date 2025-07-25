@@ -85,17 +85,6 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
     }
   }, [currentStepIndex, lessonData.steps, completeLesson, lessonId, sessionExp, addExp]);
 
-    // Handle awarding EXP for sorting questions after state has been updated
-    useEffect(() => {
-        if (currentStep.type === 'interactive_sorting' && sortingChoice !== null) {
-            setIsAnswered(true);
-            const isCorrect = sortingChoice === currentStep.scenarios[currentScenarioIndex].wiseChoice;
-            if (isCorrect) {
-                setSessionExp(prev => prev + (currentStep.exp || 0));
-            }
-        }
-    }, [sortingChoice, currentStep, currentScenarioIndex]);
-
 
   const handleOptionClick = (option: any) => {
     if (isAnswered) return;
@@ -161,6 +150,11 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
   const handleSortingClick = (choice: 'Good Debt' | 'Bad Debt') => {
       if (isAnswered) return;
       setSortingChoice(choice);
+      setIsAnswered(true);
+      const isCorrect = choice === currentStep.scenarios[currentScenarioIndex].wiseChoice;
+      if (isCorrect) {
+          setSessionExp(prev => prev + (currentStep.exp || 0));
+      }
   }
 
   const isCorrectInteractive = useMemo(() => {
