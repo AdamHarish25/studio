@@ -138,7 +138,7 @@ const budgetingBasics: LessonData = {
             type: 'lesson_intro',
             title: 'Budgeting Basics',
             text: "Your first salary is exciting! Let's learn how a simple budget can help you control your money and reach your goals.",
-            illustration_url: 'https://i.imgur.com/3nL3gd7.png',
+            illustration_url: '/visualHead.jpeg',
             exp: 10,
         },
         {
@@ -200,7 +200,7 @@ const understandingDebt: LessonData = {
             type: 'lesson_intro',
             title: 'What is Debt?',
             text: "Debt is when you borrow money that you have to pay back, usually with an extra charge called 'interest'. Let's learn how to make debt work for you, not against you.",
-            illustration_url: 'https://i.imgur.com/2U5VqX6.png',
+            illustration_url: '/DebtIllust.png',
             exp: 10
         },
         {
@@ -244,7 +244,7 @@ const savingsAndInvestments: LessonData = {
             type: 'lesson_intro',
             title: 'Grow Your Money',
             text: "Putting money aside is smart, but making it grow is even smarter. Let's explore the difference between saving and investing.",
-            illustration_url: 'https://i.imgur.com/G5VwB8A.png',
+            illustration_url: '/InvestIllust.png',
             exp: 10
         },
         {
@@ -307,7 +307,7 @@ const finalReview: LessonData = {
             type: 'lesson_intro',
             title: 'The Final Challenge',
             text: "It's time to put everything you've learned to the test. You will manage your finances through several life events. Your goal is to finish with a positive net worth. Good luck!",
-            illustration_url: 'https://i.imgur.com/pYqZzF1.png',
+            illustration_url: '/FinalIllust.png',
             exp: 10,
         },
         {

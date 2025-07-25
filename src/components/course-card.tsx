@@ -24,7 +24,7 @@ export function CourseCard({ title, description, lessons }: CourseCardProps) {
       <CardHeader className="p-4">
         <div className="aspect-video overflow-hidden rounded-lg border">
           <Image
-            src="https://placehold.co/600x400.png"
+            src="/FinancialLiteracy.png"
             data-ai-hint="statistics finance"
             alt="Everyday Statistics"
             width={600}

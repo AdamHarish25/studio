@@ -105,7 +105,7 @@ export function LessonMap({ lessons }: LessonMapProps) {
       </div>
       
       {selectedLesson && (
-        <Card className="sticky bottom-4 mt-8 w-full shadow-2xl animate-in fade-in slide-in-from-bottom-10 duration-500">
+        <Card className="sticky bottom-4 mt-8 w-full shadow-2xl animate-in fade-in slide-in-from-bottom-10 duration-500 z-20">
           <CardContent className="flex items-center justify-between p-4">
             <div>
               <h3 className="font-bold">{selectedLesson.title}</h3>
