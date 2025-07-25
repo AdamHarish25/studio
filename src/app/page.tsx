@@ -1,7 +1,16 @@
 import { Header } from '@/components/layout/header';
 import { CourseCard } from '@/components/course-card';
 import { LessonMap } from '@/components/lesson-map';
-import { courseData } from '@/lib/course-data';
+import { courseData, allCourseData } from '@/lib/course-data';
+
+// Calculate total exercises once, here on the page component
+const totalExercises = Object.values(allCourseData).reduce((total, lesson) => {
+    return total + lesson.steps.filter(step => 
+        step.type === 'question' || 
+        step.type.startsWith('interactive_')
+    ).length;
+}, 0);
+
 
 export default function Home() {
   return (
@@ -14,6 +23,7 @@ export default function Home() {
               title={courseData.title}
               description={courseData.description}
               lessons={courseData.lessons.length}
+              exercises={totalExercises}
             />
           </div>
           <div className="md:col-span-2 lg:col-span-3">
