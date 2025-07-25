@@ -8,7 +8,7 @@ export default function Home() {
     <div className="flex min-h-screen w-full flex-col">
       <Header />
       <main className="flex-1 bg-background">
-        <div className="container mx-auto grid grid-cols-1 gap-8 px-4 py-8 md:grid-cols-3 md:gap-12 md:px-8 lg:grid-cols-4 lg:gap-16">
+        <div className="mx-auto grid w-full max-w-screen-2xl grid-cols-1 gap-8 px-4 py-8 md:grid-cols-3 md:gap-12 md:px-8 lg:grid-cols-4 lg:gap-16">
           <div className="md:col-span-1 lg:col-span-1">
             <CourseCard
               title={courseData.title}
