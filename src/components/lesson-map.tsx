@@ -86,10 +86,10 @@ export function LessonMap({ lessons }: LessonMapProps) {
                  )}
               </div>
 
-              <div className="ml-8 flex-1">
+              <div className="ml-4 sm:ml-8 flex-1">
                  <div
                     className={cn(
-                        "font-semibold",
+                        "font-semibold text-sm",
                         isLocked ? "text-muted-foreground" : "text-foreground"
                     )}
                  >
@@ -106,12 +106,12 @@ export function LessonMap({ lessons }: LessonMapProps) {
       
       {selectedLesson && (
         <Card className="sticky bottom-4 mt-8 w-full shadow-2xl animate-in fade-in slide-in-from-bottom-10 duration-500 z-20">
-          <CardContent className="flex items-center justify-between p-4">
-            <div>
+          <CardContent className="flex flex-col sm:flex-row items-center justify-between p-4 gap-4">
+            <div className="text-center sm:text-left">
               <h3 className="font-bold">{selectedLesson.title}</h3>
               <p className="text-sm text-muted-foreground">{selectedLesson.description}</p>
             </div>
-            <Button asChild size="lg" disabled={getStatus(selectedLesson.id) === 'locked'}>
+            <Button asChild size="lg" disabled={getStatus(selectedLesson.id) === 'locked'} className="w-full sm:w-auto flex-shrink-0">
               <Link href={`/lesson/${selectedLesson.slug}`}>
                 {getStatus(selectedLesson.id) === 'completed' ? 'Review' : 'Start'}
               </Link>

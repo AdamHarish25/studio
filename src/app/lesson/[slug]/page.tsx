@@ -17,7 +17,7 @@ export default function LessonPage({ params }: { params: { slug: string } }) {
   return (
     <div className="flex min-h-screen w-full flex-col bg-background">
        <Header />
-       <main className="flex flex-1 flex-col items-center justify-center p-4 sm:p-6 md:p-8">
+       <main className="flex flex-1 flex-col items-center justify-center p-4 sm:p-6">
             <div className="w-full max-w-4xl mb-4">
                  <Button asChild variant="ghost">
                     <Link href="/">

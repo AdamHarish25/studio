@@ -241,7 +241,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
     if (currentStep.type === 'question') return isAnswered;
     if (['interactive_balance', 'interactive_sorting'].includes(currentStep.type)) return isAnswered;
     return false;
-  }, [currentStep.type, isAnswered, sandboxState.remaining, isCorrectInteractive, scenarioState, currentStep]);
+  }, [currentStep.type, isAnswered, sandboxState.remaining, scenarioState, currentStep]);
 
   const showTryAgainButton = useMemo(() => {
     if (currentStep.type === 'question') return isAnswered && !selectedOption?.isCorrect;
@@ -274,7 +274,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
                     alt="Budgeting illustration"
                     width={600}
                     height={400}
-                    className="max-h-[300px] object-contain mb-8 rounded-2xl"
+                    className="max-h-[200px] sm:max-h-[300px] object-contain mb-6 sm:mb-8 rounded-2xl"
                 />
                 <h2 className="font-extrabold text-2xl sm:text-4xl mb-4 text-foreground">{currentStep.title}</h2>
                 <p className="text-muted-foreground text-base sm:text-lg max-w-prose mb-8">{currentStep.text}</p>
@@ -521,12 +521,12 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
             <div className="w-full grid grid-cols-2 gap-4 mb-4 text-center">
                 <Card className="p-4 bg-blue-500/10">
                     <div className="flex justify-center items-center gap-2 mb-2"><Landmark className="h-5 w-5 text-blue-600"/> <h3 className="font-bold text-blue-800">Savings</h3></div>
-                    <p className="font-extrabold text-2xl text-blue-600">{100 - riskReturnAllocation}%</p>
+                    <p className="font-extrabold text-xl sm:text-2xl text-blue-600">{100 - riskReturnAllocation}%</p>
                     <p className="text-sm font-bold text-muted-foreground">{formatCurrency(savingsAmount)}</p>
                 </Card>
                  <Card className="p-4 bg-green-500/10">
                     <div className="flex justify-center items-center gap-2 mb-2"><TrendingUp className="h-5 w-5 text-green-600"/> <h3 className="font-bold text-green-800">Investments</h3></div>
-                    <p className="font-extrabold text-2xl text-green-600">{riskReturnAllocation}%</p>
+                    <p className="font-extrabold text-xl sm:text-2xl text-green-600">{riskReturnAllocation}%</p>
                     <p className="text-sm font-bold text-muted-foreground">{formatCurrency(investmentAmount)}</p>
                 </Card>
             </div>
@@ -563,7 +563,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
             </div>
             <Card className="p-4 bg-primary/10 w-full max-w-sm">
                 <p className="text-sm font-bold text-primary text-center">Projected Value in {years} Years</p>
-                <p className="text-3xl font-extrabold text-primary text-center">{formatCurrency(totalFutureValue)}</p>
+                <p className="text-2xl sm:text-3xl font-extrabold text-primary text-center">{formatCurrency(totalFutureValue)}</p>
                 <p className="text-sm font-bold text-muted-foreground text-center">(Earnings: {formatCurrency(totalEarnings)})</p>
             </Card>
           </div>
@@ -637,13 +637,13 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
                         <Shield className="h-6 w-6 text-primary"/>
                     </div>
                     <div>
-                        <h3 className="font-extrabold text-xl text-foreground">{currentEvent.title}</h3>
+                        <h3 className="font-extrabold text-lg sm:text-xl text-foreground">{currentEvent.title}</h3>
                         <p className="text-muted-foreground">{currentEvent.text}</p>
                     </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                     {currentEvent.choices.map((choice, index) => (
-                        <Button key={index} variant="outline" size="lg" className="h-auto p-4 justify-start" onClick={() => handleScenarioChoice(choice)}>
+                        <Button key={index} variant="outline" size="lg" className="h-auto p-4 justify-start text-left" onClick={() => handleScenarioChoice(choice)}>
                             {choice.text}
                         </Button>
                     ))}
@@ -738,13 +738,13 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
   return (
     <>
     <Card className="w-full max-w-3xl shadow-soft font-body">
-      <CardHeader>
+      <CardHeader className="p-4 sm:p-6">
         <div className="flex justify-between items-center mb-4">
-          <CardTitle className="font-extrabold text-2xl sm:text-3xl text-foreground">{lessonData.title}</CardTitle>
+          <CardTitle className="font-extrabold text-xl sm:text-3xl text-foreground">{lessonData.title}</CardTitle>
         </div>
         <Progress value={progress} className="w-full h-3 bg-accent" />
       </CardHeader>
-      <CardContent className="px-6 py-8 sm:p-10 flex flex-col items-center justify-between min-h-[500px]">
+      <CardContent className="px-4 py-6 sm:p-10 flex flex-col items-center justify-between min-h-[450px] sm:min-h-[500px]">
         
         <div className="w-full flex-grow flex flex-col items-center justify-center">
             {renderContent()}
@@ -752,12 +752,12 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
             {isAnswered && (currentStep.type === 'question' || currentStep.type === 'interactive_balance' || currentStep.type === 'interactive_sorting') && renderFeedback()}
         </div>
 
-        <div className="mt-8 pt-4">
+        <div className="mt-8 pt-4 w-full flex flex-col sm:flex-row items-center justify-center gap-4">
           {showContinueButton && (
             <Button 
               onClick={handleContinue} 
               size="lg"
-              className="font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform bg-primary hover:bg-accent-hover"
+              className="w-full sm:w-auto font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform bg-primary hover:bg-accent-hover"
             >
               {currentStep.type === 'lesson_intro' ? 'Start Learning' : 'Continue'}
             </Button>
@@ -767,21 +767,21 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData; les
               onClick={handleTryAgain} 
               size="lg"
               variant="outline"
-              className="font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform hover:bg-accent-hover"
+              className="w-full sm:w-auto font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform hover:bg-accent-hover"
             >
               Try Again
             </Button>
           )}
            {currentStep.type === 'final' && (
-            <div className="flex gap-4">
-                <Button asChild size="lg" className="font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform bg-primary hover:bg-accent-hover">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                <Button asChild size="lg" className="w-full sm:w-auto font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform bg-primary hover:bg-accent-hover">
                     <a href="/">Back to Courses</a>
                 </Button>
                 <Button 
                     onClick={handleRestart} 
                     size="lg"
                     variant="outline"
-                    className="font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform hover:bg-accent-hover"
+                    className="w-full sm:w-auto font-extrabold text-lg px-10 py-6 rounded-2xl shadow-md hover:shadow-soft hover:-translate-y-1 transition-all duration-300 ease-in-out transform hover:bg-accent-hover"
                     >
                     Start Over
                 </Button>
