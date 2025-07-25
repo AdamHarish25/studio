@@ -85,16 +85,16 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
     }
   }, [currentStepIndex, lessonData.steps, completeLesson, lessonId, sessionExp, addExp]);
 
-  // Handle awarding EXP for sorting questions after state has been updated
-  useEffect(() => {
-    if (currentStep.type === 'interactive_sorting' && sortingChoice !== null) {
-        setIsAnswered(true);
-        const isCorrect = sortingChoice === currentStep.scenarios[currentScenarioIndex].wiseChoice;
-        if (isCorrect) {
-            setSessionExp(prev => prev + (currentStep.exp || 0));
+    // Handle awarding EXP for sorting questions after state has been updated
+    useEffect(() => {
+        if (currentStep.type === 'interactive_sorting' && sortingChoice !== null) {
+            setIsAnswered(true);
+            const isCorrect = sortingChoice === currentStep.scenarios[currentScenarioIndex].wiseChoice;
+            if (isCorrect) {
+                setSessionExp(prev => prev + (currentStep.exp || 0));
+            }
         }
-    }
-  }, [sortingChoice, currentStep, currentScenarioIndex]);
+    }, [sortingChoice, currentStep, currentScenarioIndex]);
 
 
   const handleOptionClick = (option: any) => {
@@ -107,10 +107,6 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
   };
 
   const handleContinue = () => {
-    if (['lesson_intro', 'allocation_feedback', 'interactive_sandbox'].includes(currentStep.type)) {
-        setSessionExp(prev => prev + (currentStep.exp || 0));
-    }
-
     if (currentStepIndex < lessonData.steps.length - 1) {
       setCurrentStepIndex(currentStepIndex + 1);
     }
@@ -556,5 +552,7 @@ export function FinQuest({ lessonData, lessonId }: { lessonData: LessonData, les
     </Card>
   );
 }
+
+    
 
     
